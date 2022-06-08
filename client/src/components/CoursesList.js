@@ -1,9 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Container, Table, Row, Col, Button, Navbar, Form, FormControl, NavDropdown, Nav } from "react-bootstrap";
+import { Container, Table, Row, Col, Button, Navbar, Form, FormControl, NavDropdown, Nav, Fade } from "react-bootstrap";
 import React from "react";
 import { BsCollectionPlay } from "react-icons/bs";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function CoursesList(props) {
@@ -37,7 +37,7 @@ function CoursesList(props) {
 
             <Row >
                 <Col md={2} className="below-nav">
-                    Piano degli studi
+                    <h1> Elenco dei corsi </h1>
                 </Col>
                 <Col md={10} className="below-nav" >
                     <CoursesListTable courses={props.courses} />
@@ -61,7 +61,7 @@ function CoursesListTable(props) {
                 <Table>
                     <thead>
                         <tr>
-                            <th>Codice</th><th>Nome</th><th>Crediti</th><th>Max Studenti</th><th>Incompatibilità</th><th>Propedeuticità</th>
+                            <th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,7 +88,7 @@ function CoursesRow(props) {
     );
 }
 function CoursesData(props) {
-
+    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
 
     return (
@@ -96,9 +96,24 @@ function CoursesData(props) {
             <td> {props.courses.codice} </td>
             <td> {props.courses.nome} </td>
             <td> {props.courses.crediti} </td>
+            <td> { } </td>
             <td> {props.courses.maxstudenti} </td>
-            <td> {props.courses.incompatibilità} </td>
-            <td> {props.courses.propedeuticità} </td>
+            <td> <Button variant="info"
+                onClick={() => setOpen(!open)}
+                aria-controls="example-fade-text"
+                aria-expanded={open}
+            >
+                Espandi
+            </Button>
+                <Fade in={open}>
+                    <div id="example-fade-text">
+                        <li>Incompatibilità : {props.courses.incompatibilità}</li>
+                        <li>Propedeuticità : {props.courses.propedeuticità ? props.courses.propedeuticità : "-"}</li>
+                    </div>
+                </Fade>
+            </td >
+            {/*<td> {props.courses.incompatibilità; 
+        props.courses.propedeuticità} </td>*/}
         </>
     );
 }

@@ -26,7 +26,7 @@ function App() {
         <Container fluid className="App">
           <Routes>
             <Route path='/' element={<CoursesList courses={courses} />} />
-            <Route path='/home' />
+            <Route path='/home-logged element= {}' />
           </Routes>
         </Container>
       </BrowserRouter>
