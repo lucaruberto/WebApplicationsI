@@ -17,10 +17,11 @@ exports.listCourses = () => {
                 return;
             }
             //console.log(rows);
-            const films = rows.map((c) => ({
-                codice: c.Codice, nome: c.Nome, crediti: c.Crediti, maxstudenti: c.MaxStudenti, incompatibilità: c.Incompatibilità, propedeuticità: c.Propedeuticità
+            const courses = rows.map((c) => ({
+                codice: c.Codice, nome: c.Nome, crediti: c.Crediti, iscritti: c.Iscritti,
+                maxstudenti: c.MaxStudenti, incompatibilità: c.Incompatibilità, propedeuticità: c.Propedeuticità
             }));
-            resolve(films);
+            resolve(courses);
         });
     });
 };

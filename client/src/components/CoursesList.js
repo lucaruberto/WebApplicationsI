@@ -43,11 +43,11 @@ function CoursesList(props) {
                     <CoursesListTable courses={props.courses} />
                 </Col>
             </Row>
-            <Row >
+            {/*<Row >
                 <Col>
                     <Button variant="warning" size="lg" className="fixed-right-bottom">Crea piano degli studi</Button>
                 </Col>
-            </Row>
+            </Row>*/}
 
 
         </>
@@ -96,7 +96,7 @@ function CoursesData(props) {
             <td> {props.courses.codice} </td>
             <td> {props.courses.nome} </td>
             <td> {props.courses.crediti} </td>
-            <td> { } </td>
+            <td> {props.courses.iscritti} </td>
             <td> {props.courses.maxstudenti} </td>
             <td> <Button variant="info"
                 onClick={() => setOpen(!open)}
@@ -112,8 +112,6 @@ function CoursesData(props) {
                     </div>
                 </Fade>
             </td >
-            {/*<td> {props.courses.incompatibilità; 
-        props.courses.propedeuticità} </td>*/}
         </>
     );
 }
