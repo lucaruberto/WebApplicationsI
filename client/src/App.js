@@ -6,7 +6,7 @@ import { LoginForm, LogoutButton } from './components/LoginComponents';
 import { Container } from 'react-bootstrap/';
 import { useEffect, useState } from 'react';
 import API from './API';
-import { CoursesList } from './components/CoursesList';
+import { CoursesList, PlanPage } from './components/CoursesList';
 
 function App() {
   return (
@@ -25,6 +25,7 @@ function App2() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("CheckAut: " + loggedIn);
     const checkAuth = async () => {
       try {
         // here you have the user info, if already logged in
@@ -47,6 +48,7 @@ function App2() {
   }, [loggedIn])*/
 
   useEffect(() => {
+    console.log("GetAll: " + loggedIn);
     API.getAllCourses().then((list) => { setCourses(list) })
       .catch(err => handleError(err))
   }, [])
@@ -56,18 +58,20 @@ function App2() {
   }
 
   const doLogIn = (credentials) => {
+    console.log("Here");
     API.logIn(credentials)
       .then(user => {
         setLoggedIn(true);
         setUser(user);
-        setMessage('');
-        navigate('/');
+        setMessage('Logged');
+        navigate('/home-logged');
       })
       .catch(err => {
         setMessage(err);
       }
       )
   }
+
   const doLogOut = async () => {
     await API.logOut();
     setLoggedIn(false);
@@ -76,9 +80,9 @@ function App2() {
   return (
     <>
       <Routes>
-        <Route path='/' element={<CoursesList courses={courses} />} />
+        <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} />} />
         <Route path='/login' element={loggedIn ? <Navigate to='/' /> : <LoginForm login={doLogIn} />} />
-        <Route path='/home-logged ' />
+        <Route path='/home-logged' element={<PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} />} />
       </Routes>
 
     </>

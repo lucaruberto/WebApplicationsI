@@ -6,7 +6,12 @@
   height: 40vmin;
   pointer-events: none;
 }
-
+.accordion-text-width{
+  width: 11rem;
+}
+.coltable{
+  height: 5rem;
+}
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
