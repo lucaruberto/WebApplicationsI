@@ -52,7 +52,7 @@ function LogoutButton(props) {
   return (
     <Col>
       <span>Benvenuto: {props.user?.name}</span>{'    '}
-      <Button variant="outline-primary" onClick={props.logout}>Logout</Button>
+      <Button variant="outline-danger" onClick={props.logout}>Logout</Button>
     </Col>
   )
 }

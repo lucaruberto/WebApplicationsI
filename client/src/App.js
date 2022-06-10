@@ -7,7 +7,7 @@ import { Container } from 'react-bootstrap/';
 import { useEffect, useState } from 'react';
 import API from './API';
 import { CoursesList, PlanPage } from './components/CoursesList';
-
+import { PlanComponents } from './components/PlanComponents';
 function App() {
   return (
     <Router>
@@ -19,9 +19,11 @@ function App2() {
   const [courses, setCourses] = useState([]); //Lista di corsi versione Client-Server
   const [loggedIn, setLoggedIn] = useState(false);  // no user is logged in when app loads
   const [user, setUser] = useState({});
+  const [planExists, setPlanExists] = useState(false);
   const [message, setMessage] = useState('');
   const [dirty, setDirty] = useState(true);
-
+  const [onAdd, setOnAdd] = useState(false);
+  const [time, setTime] = useState(0); /* 1 = Full Time, 0 = Part Time */
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,13 +78,19 @@ function App2() {
     await API.logOut();
     setLoggedIn(false);
     setUser({});
+
+    navigate('/');
   }
   return (
     <>
       <Routes>
         <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} />} />
         <Route path='/login' element={loggedIn ? <Navigate to='/' /> : <LoginForm login={doLogIn} />} />
-        <Route path='/home-logged' element={<PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} />} />
+        <Route path='/home-logged' element={<PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
+          planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime}
+          onAdd={onAdd} setOnAdd={setOnAdd} />} >
+          <Route path='add' element={<PlanComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} />} />
+        </Route>
       </Routes>
 
     </>

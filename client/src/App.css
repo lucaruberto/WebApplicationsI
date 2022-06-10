@@ -32,7 +32,9 @@
 .below-nav {
   padding-top: 5rem;
 }
-
+.acc{
+  max-height: 50vh;
+}
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

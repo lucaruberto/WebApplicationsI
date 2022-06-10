@@ -4,20 +4,79 @@ import { Container, Table, Row, Col, Button, Navbar, Form, FormControl, NavDropd
 import React from "react";
 import { BsCollectionPlay } from "react-icons/bs";
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link, useLocation, Outlet } from 'react-router-dom';
 import { LogoutButton } from './LoginComponents';
 
 function PlanPage(props) {
+    console.log(props.onAdd);
+    const location = useLocation();
+    /* Sistemare la pagina nel caso il piano esiste già -> props.planExists */
     return (
         <>
             <Container fluid  >
+                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user} />
+                {props.planExists ? <PlanTable /> : <> <Row className='below-nav'>
+                    <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
+                    <Col md={10} className="below-nav">
+                        {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} />}
+                    </Col>
+                </Row>
+                </>}
+                <Row className="below-nav">
 
-                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} user={props.user} />
-                <Row xs={2}> Ciao</Row>
+                </Row>
+
             </Container>
 
         </>)
 }
+function CreatePlan(props) {
+    const [isSwitch1On, setIsSwitch1On] = useState(false);
+    const [isSwitch2On, setIsSwitch2On] = useState(true);
+    const location = useLocation();
+    const onSwitch1Action = (event) => {
+        setIsSwitch1On(!isSwitch1On);
+    };
+    const onSwitch2Action = (event) => {
+        setIsSwitch2On(!isSwitch2On);
+    };
+    return (
+        <>
+            <Row><h5>Scegli la tipologia di piano</h5></Row>
+            <Row>
+                <Col >
+                    <Form>
+                        <div className="mb-3" >
+                            <Form.Check onChange={onSwitch1Action}
+                                inline
+                                label="Part Time (40-60 cfu)"
+                                name="group1"
+                                checked={isSwitch1On}
+                                disabled={isSwitch2On}
+                                type="checkbox"
+                                id={`inline-1`}
+                            />
+                            <Form.Check onChange={onSwitch2Action}
+                                inline
+                                label="Full Time (60-80 cfu)"
+                                name="group1"
+                                type="checkbox"
+                                checked={isSwitch2On}
+                                disabled={isSwitch1On}
+                                id={`inline-2`}
+                            /> </div> </Form>
+                </Col>
+                <Col >
+                    <Link to="add" state={{ nextpage: location.pathname }} >
+                        <Button variant="primary" size="lg" className="fixed-right-bottom" onClick={() => props.setOnAdd(true)} > Crea </Button>
+                    </Link> </Col>
+            </Row>
+        </>
+    );
+};
+function PlanTable(props) {
+    return (false);
+};
 
 function CoursesList(props) {
     const navigate = useNavigate();
@@ -108,7 +167,7 @@ function CoursesData(props) {
             <td> <Accordion className="accordion-text-width">
                 <Accordion.Item eventKey="0">
                     <Accordion.Header >Espandi</Accordion.Header>
-                    <Accordion.Body alwaysOpen >
+                    <Accordion.Body  >
                         <div>
                             <li>Incompatibilità : {props.courses.incompatibilità}</li>
                             <li>Propedeuticità : {props.courses.propedeuticità ? props.courses.propedeuticità : "-"}</li>
@@ -134,5 +193,10 @@ function CoursesData(props) {
         </>
     );
 }
+function PlanOption(props) {
 
+    <Row><Button>Full Time</Button>
+        <Button>Part Time</Button>
+    </Row>
+}
 export { CoursesList, PlanPage };
