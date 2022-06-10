@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Container, Table, Row, Col, Button, Navbar, Form, FormControl, NavDropdown, Nav, Fade, Collapse, Accordion } from "react-bootstrap";
+import { Container, Table, Row, Col, Button, Navbar, Form, Nav, Accordion } from "react-bootstrap";
 import React from "react";
 import { BsCollectionPlay } from "react-icons/bs";
 import { useEffect, useState } from 'react';
@@ -9,22 +9,21 @@ import { LogoutButton } from './LoginComponents';
 
 function PlanPage(props) {
     console.log(props.onAdd);
-    const location = useLocation();
     /* Sistemare la pagina nel caso il piano esiste già -> props.planExists */
     return (
         <>
             <Container fluid  >
                 <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user} />
-                {props.planExists ? <PlanTable /> : <> <Row className='below-nav'>
-                    <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
-                    <Col md={10} className="below-nav">
-                        {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} />}
-                    </Col>
-                </Row>
-                </>}
-                <Row className="below-nav">
+                {
+                    props.planExists ? <StudyPlan /> : <> <Row className='below-nav'>
+                        <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
+                        <Col md={10} >
+                            {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} />}
+                        </Col>
+                    </Row>
+                    </>
+                }
 
-                </Row>
 
             </Container>
 
@@ -68,13 +67,13 @@ function CreatePlan(props) {
                 </Col>
                 <Col >
                     <Link to="add" state={{ nextpage: location.pathname }} >
-                        <Button variant="primary" size="lg" className="fixed-right-bottom" onClick={() => props.setOnAdd(true)} > Crea </Button>
+                        <Button variant="warning" size="lg" className="fixed-right-bottom" onClick={() => props.setOnAdd(true)} > Crea </Button>
                     </Link> </Col>
             </Row>
         </>
     );
 };
-function PlanTable(props) {
+function StudyPlan(props) {
     return (false);
 };
 
@@ -95,7 +94,7 @@ function CoursesList(props) {
                         </Form>
                         <Nav >
                             {props.loggedIn ? <LogoutButton logout={props.logout} user={props.user} loggedIn={props.loggedIn} /> :
-                                <Button onClick={() => { navigate("/login"); }} variant="dark"> Login </Button>}
+                                <Button onClick={() => { navigate("/login"); }} variant="success"> Login </Button>}
                         </Nav>
 
                     </Navbar>
@@ -132,7 +131,6 @@ function CoursesListTable(props) {
                     <tbody>
                         {props.courses.map((courses, i) =>
                             <CoursesRow courses={courses} key={i} />)}
-
                     </tbody>
                 </Table>
             </Row>
@@ -142,9 +140,6 @@ function CoursesListTable(props) {
 }
 
 function CoursesRow(props) {
-
-    //Vedi codice del prof per colorare riga della tabella di colore
-    //rosso, verde e giallo per modifica aggiunta
     return (
         <>
             <tr>
@@ -154,9 +149,6 @@ function CoursesRow(props) {
     );
 }
 function CoursesData(props) {
-    const [open, setOpen] = useState(false);
-    const navigate = useNavigate();
-
     return (
         <>
             <td> {props.courses.codice} </td>
@@ -192,11 +184,5 @@ function CoursesData(props) {
     </Accordion> */}
         </>
     );
-}
-function PlanOption(props) {
-
-    <Row><Button>Full Time</Button>
-        <Button>Part Time</Button>
-    </Row>
 }
 export { CoursesList, PlanPage };
