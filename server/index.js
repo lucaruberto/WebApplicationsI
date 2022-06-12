@@ -82,6 +82,53 @@ app.get('/api/courses', (req, res) => {
     .catch(() => res.status(500).end());
 });
 
+// POST /api/plan
+app.post('/api/plan', isLoggedIn, [
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  //Inserire anche tipologia di piano in user
+  // dao.InsertPlanType(full/part ) oppure fare una join in dao
+  const plan = {
+    /* code: req.body.code,
+    score: req.body.score,
+    date: req.body.date, */
+  };
+
+  try {
+    // You may want to check that the course code exists before doing the creation
+    await dao.createPlan(plan, req.user.id);   // It is WRONG to use something different from req.user.id
+    // In case that a new ID is created and you want to use it, take it from await, and return it to client.
+    res.status(201).end();
+  } catch (err) {
+    console.log(err);
+    // res.status(503).json({error: `Database error during the creation of exam ${plan.code}.`});
+  }
+});
+
+// DELETE /api/plan/:course
+app.delete('/api/plan/:course', isLoggedIn, async (req, res) => {
+  try {
+    await dao.deletePlanCourse(req.params.code, req.user.id);
+    res.status(204).end();
+  } catch (err) {
+    console.log(err);
+    res.status(503).json({ error: `Database error during the deletion of course from a Plan ${req.params.code}.` });
+  }
+});
+
+// DELETE /api/plan/
+app.delete('/api/plan', isLoggedIn, async (req, res) => {
+  try {
+    await dao.deletePlan(req.params.code, req.user.id);
+    res.status(204).end();
+  } catch (err) {
+    console.log(err);
+    res.status(503).json({ error: `Database error during the deletion of Plan ${req.params.code}.` });
+  }
+});
 /*** Users APIs ***/
 
 // POST /sessions 
@@ -106,14 +153,7 @@ app.post('/api/sessions', function (req, res, next) {
   })(req, res, next);
 });
 
-// ALTERNATIVE: if we are not interested in sending error messages...
-/*
-app.post('/api/sessions', passport.authenticate('local'), (req,res) => {
-  // If this function gets called, authentication was successful.
-  // `req.user` contains the authenticated user.
-  res.json(req.user);
-});
-*/
+
 
 // DELETE /sessions/current 
 // logout

@@ -8,7 +8,6 @@ import { useNavigate, useParams, Link, useLocation, Outlet } from 'react-router-
 import { LogoutButton } from './LoginComponents';
 
 function PlanPage(props) {
-    console.log(props.onAdd);
     /* Sistemare la pagina nel caso il piano esiste già -> props.planExists */
     return (
         <>
@@ -18,27 +17,33 @@ function PlanPage(props) {
                     props.planExists ? <StudyPlan /> : <> <Row className='below-nav'>
                         <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
                         <Col md={10} >
-                            {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} />}
+                            {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} />}
                         </Col>
                     </Row>
                     </>
                 }
-
-
             </Container>
 
         </>)
 }
 function CreatePlan(props) {
     const [isSwitch1On, setIsSwitch1On] = useState(false);
-    const [isSwitch2On, setIsSwitch2On] = useState(true);
+    const [isSwitch2On, setIsSwitch2On] = useState(true); /* Full-Time selezionato di default */
     const location = useLocation();
-    const onSwitch1Action = (event) => {
+    const onSwitch1Action = () => {
         setIsSwitch1On(!isSwitch1On);
     };
-    const onSwitch2Action = (event) => {
+    const onSwitch2Action = () => {
         setIsSwitch2On(!isSwitch2On);
     };
+    const handleSubmit = () => {
+        props.setOnAdd(true);
+        if (isSwitch1On)
+            props.setTime(0)
+        else
+            props.setTime(1)
+    }
+
     return (
         <>
             <Row><h5>Scegli la tipologia di piano</h5></Row>
@@ -67,7 +72,7 @@ function CreatePlan(props) {
                 </Col>
                 <Col >
                     <Link to="add" state={{ nextpage: location.pathname }} >
-                        <Button variant="warning" size="lg" className="fixed-right-bottom" onClick={() => props.setOnAdd(true)} > Crea </Button>
+                        <Button variant="warning" size="lg" className="fixed-right-bottom" onClick={handleSubmit} > Crea </Button>
                     </Link> </Col>
             </Row>
         </>

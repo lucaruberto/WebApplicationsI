@@ -7,7 +7,7 @@ import { Container } from 'react-bootstrap/';
 import { useEffect, useState } from 'react';
 import API from './API';
 import { CoursesList, PlanPage } from './components/CoursesList';
-import { PlanComponents } from './components/PlanComponents';
+import { SelectComponents } from './components/SelectComponents.js';
 function App() {
   return (
     <Router>
@@ -20,14 +20,15 @@ function App2() {
   const [loggedIn, setLoggedIn] = useState(false);  // no user is logged in when app loads
   const [user, setUser] = useState({});
   const [planExists, setPlanExists] = useState(false);
+  const [planCfu, setPlanCfu] = useState(0);
   const [message, setMessage] = useState('');
   const [dirty, setDirty] = useState(true);
   const [onAdd, setOnAdd] = useState(false);
-  const [time, setTime] = useState(0); /* 1 = Full Time, 0 = Part Time */
+  const [time, setTime] = useState(''); /* 1 = Full Time, 0 = Part Time */
+  const [plan, setPlan] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("CheckAut: " + loggedIn);
     const checkAuth = async () => {
       try {
         // here you have the user info, if already logged in
@@ -49,8 +50,13 @@ function App2() {
         .catch(err => handleError(err))
   }, [loggedIn])*/
 
+  function addCoursePlan(course) {
+    setPlan(oldPlan => [...oldPlan, course]);
+  }
+  function incrementCfu(cfu) {
+    setPlanCfu(i => i + cfu);
+  }
   useEffect(() => {
-    console.log("GetAll: " + loggedIn);
     API.getAllCourses().then((list) => { setCourses(list) })
       .catch(err => handleError(err))
   }, [])
@@ -60,7 +66,6 @@ function App2() {
   }
 
   const doLogIn = (credentials) => {
-    console.log("Here");
     API.logIn(credentials)
       .then(user => {
         setLoggedIn(true);
@@ -88,8 +93,10 @@ function App2() {
         <Route path='/login' element={loggedIn ? <Navigate to='/' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={<PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime}
-          onAdd={onAdd} setOnAdd={setOnAdd} />} >
-          <Route path='add' element={<PlanComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} />} />
+          onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} />} >
+          <Route path='add' element={<SelectComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut}
+            user={user} addCoursePlan={addCoursePlan} plan={plan} setPlanExists={setPlanExists} incrementCfu={incrementCfu} planCfu={planCfu}
+            time={time} />} />
         </Route>
       </Routes>
 

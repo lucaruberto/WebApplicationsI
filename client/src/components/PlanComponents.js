@@ -1,80 +1,78 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Table, Row, Col, Stack } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+
 function PlanComponents(props) {
     return (<>
-        <Row><h2>Elenco degli esami</h2></Row>
-        <Row ><PlanNumberStudents /></Row>
-        <Row><PlanTable courses={props.courses} /></Row>
-        <Link to="/home-logged">
-            <Button onClick={() => props.setOnAdd(false)} variant="warning">Salva</Button>
-        </Link>
-    </>);
-};
-
-function PlanTable(props) {
-    return (
+        <Row ><PlanNumberStudents planCfu={props.planCfu} time={props.time} /></Row>
         <Container fluid>
             <Row>
                 <Table className='coltable'>
                     <thead>
                         <tr>
-                            <th>Seleziona</th> <th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th>
+                            <th>Seleziona</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {props.courses.map((courses, i) =>
-                            <TableRow courses={courses} key={i} />)}
+                        {props.plan.map((plan, i) =>
+                            <PlanRow plan={plan} key={i} />)}
                     </tbody>
                 </Table>
             </Row>
-
         </Container>
-    );
+        <Link to="/home-logged">
+            <Button onClick={() => props.setOnAdd(false)} variant="warning">Salva</Button>
+        </Link>
+    </>);
 };
-
-function TableRow(props) {
+function PlanRow(props) {
     return (
         <>
             <tr>
-                <TableData courses={props.courses} />
+                <PlanData plan={props.plan} />
             </tr>
         </>
     );
 };
-
-function TableData(props) {
+{/* Aggiungere bottone elimina */ }
+function PlanData(props) {
     return (
         <>
             <td>
-                <Form.Check variant="warning"
-                    type="checkbox"
-                //id={`default-${}`}
-                //label={`default ${type}`}
-                />
+                <i className="bi bi-trash" onClick={() => { }} />
             </td>
-            <td> {props.courses.codice} </td>
-            <td> {props.courses.nome} </td>
-            <td> {props.courses.crediti} </td>
-            <td> {props.courses.iscritti} </td>
-            <td> {props.courses.maxstudenti} </td>
+            <td> {props.plan.codice} </td>
+            <td> {props.plan.nome} </td>
+            <td> {props.plan.crediti} </td>
+            <td> {props.plan.iscritti} </td>
+            <td> {props.plan.maxstudenti} </td>
         </>
     );
 };
 function PlanNumberStudents(props) {
+    let cfuMin;
+    let cfuMax;
     const divStyle = {
         color: 'black',
         border: "2px solid orange"
     };
+    console.log(props.time);
+    if (props.time == 0) {
+        cfuMin = 40; cfuMax = 60;
+    }
+    else if (props.time == 1) {
+        cfuMin = 60; cfuMax = 80;
+    }
+
     return (
         <>
             <Stack direction="horizontal" gap={5}>
-                <div style={divStyle}>Cfu</div>
-                <Cfu />
-                <div style={divStyle}>Min Cfu</div>
-                <CfuMin />
-                <div style={divStyle}>Max Cfu</div>
-                <CfuMax />
+                <div >Cfu Attuali</div>
+                <div>{props.planCfu}</div>
+                <div >Min Cfu</div>
+                <div>{cfuMin}</div>
+                <div >Max Cfu</div>
+                <div>{cfuMax}</div>
             </Stack>
         </>);
 };
@@ -85,7 +83,7 @@ function Cfu(props) {
         border: "2px solid black"
     };
     return (
-        <div style={divStyle} md>
+        <div >
             1
         </div>
     );
@@ -97,7 +95,7 @@ function CfuMin(props) {
         border: "2px solid black"
     };
     return (
-        <div style={divStyle} md>
+        <div  >
             1
         </div>
     );
@@ -109,16 +107,9 @@ function CfuMax(props) {
         border: "2px solid black"
     };
     return (
-        <div style={divStyle} md>
+        <div  >
             1
         </div>
     );
 };
-function PlanCheck(props) {
-    return (<>
-
-    </>
-    );
-};
 export { PlanComponents };
-

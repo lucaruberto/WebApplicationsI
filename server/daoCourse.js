@@ -6,7 +6,6 @@ const db = new sqlite.Database('course.db', (err) => {
     if (err) throw err;
 });
 
-
 // Get all courses
 exports.listCourses = () => {
     return new Promise((resolve, reject) => {
@@ -16,7 +15,6 @@ exports.listCourses = () => {
                 reject(err);
                 return;
             }
-            //console.log(rows);
             const courses = rows.map((c) => ({
                 codice: c.Codice, nome: c.Nome, crediti: c.Crediti, iscritti: c.Iscritti,
                 maxstudenti: c.MaxStudenti, incompatibilità: c.Incompatibilità, propedeuticità: c.Propedeuticità
@@ -25,3 +23,43 @@ exports.listCourses = () => {
         });
     });
 };
+
+exports.createPlan = (course, userId) => {
+    return new Promise.all((resolve, reject) => {
+        const sql = 'INSERT INTO Plan(userId, course) VALUES(?, ?)';
+        db.run(sql, [userId, course.codice], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
+            if (err) {
+                reject(err);
+                return;
+            }
+            //console.log('createExam lastID: ' + this.lastID);
+            resolve(this.lastID);
+        });
+    });
+};
+
+exports.deletePlanCourse = (course, userId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM Plan WHERE course = ? AND userid = ?';
+        db.run(sql, [course, userId], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else
+                resolve(null);
+        });
+    });
+}
+
+exports.deletePlan = (userId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM Plan WHERE userId = ?';
+        db.run(sql, [userId], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else
+                resolve(null);
+        });
+    });
+}
