@@ -1,5 +1,6 @@
-# Exam #12345: "Exam Title"
-## Student: s123456 LASTNAME FIRSTNAME 
+# Exam #1: "Piano di studi"
+
+## Student: s305902 RUBERTO LUCA
 
 ## React Client Application Routes
 

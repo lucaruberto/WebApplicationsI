@@ -65,14 +65,39 @@ function SelectData(props) {
 /* Selection of one cours to insert in the Plan */
 function SelectCheck(props) {
     const [isChecked, setIsChecked] = useState(false);
-    let setDisabled = false;
+    const [disabled, setDisabled] = useState(false);
+    /* Funzione per disabilitare il check */
+    /* Dovrebbe esserci anche una useEffect per colorare in modo diverso la riga */
+    /* Si possono spostare i due stati a livello superiore insieme ad una funzione che esegue il cambiamento */
+    const dis = () => {
+        setDisabled(true);
+    }
+    const checkInc = (inc) => {
+        console.log("Inc:" + inc);
+        if (inc.indexOf(props.courses.codice) == -1)
+            return true;
+        else {
+            dis();
+            return false; /* Si deve segnare il codice incompatibile 
+                              Mostrare a video l'errore, l'esame con cui è incompatibile,
+                              disabilitare il check      */
+        }
 
+    };
     const handleOnCheck = () => {
         /* Lo stato non è ancora aggiornato, quindi si prende il precedente (!isChecked) */
         /* Controllare incompatibilità */
+        /* Controllare se esame propedeutico già presente */
+        /* Controllare num massimo studenti iscritti ed aggiornare il numero in tempo reale */
         if (!isChecked) {
-            props.addCoursePlan(props.courses);
-            props.incrementCfu(props.courses.crediti);
+            /* console.log("Codice" + props.courses.codice);
+            console.log("Codice" + props.courses.incompatibilità);
+            console.log(props.courses) */
+            if (
+                props.plan.every((c) => checkInc(c.incompatibilità))) {
+                props.addCoursePlan(props.courses);
+                props.incrementCfu(props.courses.crediti);
+            }
         }
 
         //console.log(props.plan);
@@ -83,7 +108,7 @@ function SelectCheck(props) {
     return (<>
         <Form.Check variant="warning"
             type="checkbox"
-            disabled={setDisabled}
+            disabled={disabled}
             checked={isChecked}
             //label={`default ${type}`}
             onChange={handleOnCheck} />

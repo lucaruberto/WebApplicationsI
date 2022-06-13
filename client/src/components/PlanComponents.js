@@ -36,6 +36,7 @@ function PlanRow(props) {
 };
 {/* Aggiungere bottone elimina */ }
 function PlanData(props) {
+    /* Implementare la funzione per la delete di un corso se non ci sono vincoli di propedeuticità da rispettare */
     return (
         <>
             <td>
@@ -58,7 +59,7 @@ function PlanNumberStudents(props) {
     };
     console.log(props.time);
     if (props.time == 0) {
-        cfuMin = 40; cfuMax = 60;
+        cfuMin = 20; cfuMax = 40;
     }
     else if (props.time == 1) {
         cfuMin = 60; cfuMax = 80;
