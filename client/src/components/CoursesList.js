@@ -12,7 +12,8 @@ function PlanPage(props) {
     return (
         <>
             <Container fluid  >
-                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user} />
+                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user}
+                    addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} />
                 {
                     props.planExists ? <StudyPlan /> : <> <Row className='below-nav'>
                         <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
@@ -110,7 +111,8 @@ function CoursesList(props) {
                         <h1> Elenco dei corsi </h1>
                     </Col>
                     <Col md={10}  >
-                        <CoursesListTable courses={props.courses} />
+                        <CoursesListTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan}
+                            setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} />
                     </Col>
                 </Row>
                 {/*<Row >
@@ -130,12 +132,12 @@ function CoursesListTable(props) {
                 <Table className='coltable'>
                     <thead>
                         <tr>
-                            <th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th>
+                            <th>Seleziona</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th>
                         </tr>
                     </thead>
                     <tbody>
                         {props.courses.map((courses, i) =>
-                            <CoursesRow courses={courses} key={i} />)}
+                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} />)}
                     </tbody>
                 </Table>
             </Row>
@@ -148,7 +150,8 @@ function CoursesRow(props) {
     return (
         <>
             <tr>
-                <CoursesData courses={props.courses} />
+                <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time}
+                    plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} />
             </tr>
         </>
     );
@@ -156,6 +159,8 @@ function CoursesRow(props) {
 function CoursesData(props) {
     return (
         <>
+            <td> <SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses}
+                setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} /></td>
             <td> {props.courses.codice} </td>
             <td> {props.courses.nome} </td>
             <td> {props.courses.crediti} </td>
@@ -190,4 +195,79 @@ function CoursesData(props) {
         </>
     );
 }
+
+function SelectCheck(props) {
+    const [isChecked, setIsChecked] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+    /* Funzione per disabilitare il check */
+    /* Dovrebbe esserci anche una useEffect per colorare in modo diverso la riga */
+    /* Si possono spostare i due stati a livello superiore insieme ad una funzione che esegue il cambiamento */
+
+    const dis = () => {
+        setDisabled(true);
+    }
+    /*  if (props.time != 0 && props.time != 1)
+         dis(); */
+
+    /* Non esegue la funzione la prima volta che faccio il check */
+    const checkInc = (inc, cod) => {
+
+        console.log("Codice nel piano " + cod);
+        console.log(props.courses.propedeuticità);
+        console.log(props.courses.propedeuticità);
+        console.log(props.courses.propedeuticità !== cod);
+        /* Esame incompatibile, mostrare il messaggio */
+        if (inc.indexOf(props.courses.codice) !== -1) {
+            dis();
+            return false;
+        }
+        /* È presente già un esame con lo stesso codice nel piano */
+        if (cod == props.courses.codice) {
+            dis();
+            return false;
+        }
+        if (props.courses.propedeuticità) {
+            /* Esiste */
+            console.log("Esiste")
+            if (props.courses.propedeuticità !== cod) {
+                dis();
+                return false;
+            }
+        }
+        return true;
+
+
+    };
+    const handleOnCheck = () => {
+        /* Lo stato non è ancora aggiornato, quindi si prende il precedente (!isChecked) */
+        /* Controllare incompatibilità  OK*/
+        /* Controllare se esame propedeutico già presente 
+            Nel caso non fare check/inserire, segnalare l'errore ma non disabilitare
+        */
+        /* Controllare num massimo studenti iscritti ed aggiornare il numero in tempo reale */
+        /* Controllare che l'esame non sia già presente */
+        if (!isChecked) {
+            /* console.log("Codice" + props.courses.codice);
+            console.log("Codice" + props.courses.incompatibilità);
+            console.log(props.courses) */
+            if (props.plan.every((c) => checkInc(c.incompatibilità, c.codice))
+            ) {
+                props.addCoursePlan(props.courses);
+                props.incrementCfu(props.courses.crediti);
+            }
+        }
+        //console.log(props.plan);
+        setIsChecked(!isChecked);
+    }
+    //console.log(props.plan)
+    return (<>
+        <Form.Check variant="warning"
+            type="checkbox"
+            disabled={disabled}
+            checked={isChecked}
+            //label={`default ${type}`}
+            onChange={handleOnCheck} />
+    </>
+    );
+};
 export { CoursesList, PlanPage };

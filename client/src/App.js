@@ -7,7 +7,8 @@ import { Container } from 'react-bootstrap/';
 import { useEffect, useState } from 'react';
 import API from './API';
 import { CoursesList, PlanPage } from './components/CoursesList';
-import { SelectComponents } from './components/SelectComponents.js';
+import { PlanComponents } from './components/PlanComponents.js';
+
 function App() {
   return (
     <Router>
@@ -93,10 +94,13 @@ function App2() {
         <Route path='/login' element={loggedIn ? <Navigate to='/' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={<PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime}
-          onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} />} >
-          <Route path='add' element={<SelectComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut}
+          onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} incrementCfu={incrementCfu}
+
+        />} >
+          <Route path='add' element={<PlanComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut}
             user={user} addCoursePlan={addCoursePlan} plan={plan} setPlanExists={setPlanExists} incrementCfu={incrementCfu} planCfu={planCfu}
             time={time} />} />
+          <Route path='update' />
         </Route>
       </Routes>
 

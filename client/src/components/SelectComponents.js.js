@@ -6,9 +6,10 @@ import { PlanComponents } from './PlanComponents'
 
 
 function SelectComponents(props) {
+    /*  <Row><h2>Elenco dei corsi</h2></Row>
+         <Row><SelectTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} /></Row>
+         <Row></Row> */
     return (<>
-        <Row><h2>Elenco dei corsi</h2></Row>
-        <Row><SelectTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} /></Row>
         <Row>
             <h2>Piano degli studi attuale</h2>
         </Row>
@@ -87,7 +88,9 @@ function SelectCheck(props) {
     const handleOnCheck = () => {
         /* Lo stato non è ancora aggiornato, quindi si prende il precedente (!isChecked) */
         /* Controllare incompatibilità */
-        /* Controllare se esame propedeutico già presente */
+        /* Controllare se esame propedeutico già presente 
+            Nel caso non fare check/inserire, segnalare l'errore ma non disabilitare
+        */
         /* Controllare num massimo studenti iscritti ed aggiornare il numero in tempo reale */
         if (!isChecked) {
             /* console.log("Codice" + props.courses.codice);
@@ -99,9 +102,7 @@ function SelectCheck(props) {
                 props.incrementCfu(props.courses.crediti);
             }
         }
-
         //console.log(props.plan);
-
         setIsChecked(!isChecked);
     }
     //console.log(props.plan)

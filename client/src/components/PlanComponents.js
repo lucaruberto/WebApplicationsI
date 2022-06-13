@@ -4,6 +4,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 function PlanComponents(props) {
     return (<>
+        <Row>
+            <h2>Piano degli studi attuale</h2>
+        </Row>
         <Row ><PlanNumberStudents planCfu={props.planCfu} time={props.time} /></Row>
         <Container fluid>
             <Row>
@@ -57,7 +60,6 @@ function PlanNumberStudents(props) {
         color: 'black',
         border: "2px solid orange"
     };
-    console.log(props.time);
     if (props.time == 0) {
         cfuMin = 20; cfuMax = 40;
     }
