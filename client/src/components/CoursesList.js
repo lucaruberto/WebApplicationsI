@@ -132,7 +132,7 @@ function CoursesListTable(props) {
                 <Table className='coltable'>
                     <thead>
                         <tr>
-                            <th>Seleziona</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th>
+                            <th>Seleziona</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th><th>Errori</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -147,20 +147,77 @@ function CoursesListTable(props) {
 }
 
 function CoursesRow(props) {
+    const [statusClass, setStatusClass] = useState('table-default');
+    const [message, setMessage] = useState('');
     return (
         <>
-            <tr>
+            <tr className={statusClass}>
                 <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time}
-                    plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} />
+                    plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} setStatusClass={setStatusClass} message={message} setMessage={setMessage} />
             </tr>
         </>
     );
 }
 function CoursesData(props) {
+    let cnt = 0;
+    const [isChecked, setIsChecked] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+
+    useEffect(() => {
+        if (disabled) {
+            /* Si toglie il disabilitato dopo la useEffect e quando ci sono incompatibilità */
+            /* Controllare le incompatibilità in seguito alla delete */
+            if (props.courses.propedeuticità && props.plan.some((c) => checkProp(c.codice))) {
+                setDisabled(false);
+                setIsChecked(false);
+                props.setStatusClass('table-default');
+                props.setMessage('');
+            }
+
+        }
+    }, [props.plan.length]);
+    const checkProp = (cod) => {
+        if (props.courses.propedeuticità == cod) {
+            return true;
+        }
+        return false;
+    }
+
+
+    const check = (inc, cod) => {
+        //console.log("Esame: " + props.courses.name);
+        //console.log("Esame: " + props.courses.codice);
+        /* Esame incompatibile, mostrare il messaggio */
+        if (inc.indexOf(props.courses.codice) !== -1) {
+            dis();
+            props.setStatusClass('table-danger');
+            props.setMessage("Incompatibilità con: " + props.courses.incompatibilità);
+            return false;
+        }
+        /* È presente già un esame con lo stesso codice nel piano */
+        if (cod == props.courses.codice) {
+            dis();
+            props.setStatusClass('table-danger');
+            props.setMessage("Corso già presente all'interno del piano");
+            return false;
+        }
+
+        setDisabled(false);
+        setIsChecked(false);
+        props.setStatusClass('table-default');
+        props.setMessage('');
+        return true;
+    };
+
+    const dis = () => {
+        setDisabled(true);
+    }
     return (
         <>
             <td> <SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses}
-                setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} /></td>
+                setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp}
+                setIsChecked={setIsChecked} disabled={disabled} setDisabled={setDisabled} dis={dis} setStatusClass={props.setStatusClass} setMessage={props.setMessage}
+            /></td>
             <td> {props.courses.codice} </td>
             <td> {props.courses.nome} </td>
             <td> {props.courses.crediti} </td>
@@ -178,6 +235,7 @@ function CoursesData(props) {
                 </Accordion.Item>
             </Accordion>
             </td >
+            <td>{props.message}</td>
 
             {/* <Button variant="info"
                 onClick={() => setOpen(!open)}
@@ -197,48 +255,8 @@ function CoursesData(props) {
 }
 
 function SelectCheck(props) {
-    const [isChecked, setIsChecked] = useState(false);
-    const [disabled, setDisabled] = useState(false);
-    /* Funzione per disabilitare il check */
-    /* Dovrebbe esserci anche una useEffect per colorare in modo diverso la riga */
-    /* Si possono spostare i due stati a livello superiore insieme ad una funzione che esegue il cambiamento */
-
-    const dis = () => {
-        setDisabled(true);
-    }
-    /*  if (props.time != 0 && props.time != 1)
-         dis(); */
-
-    /* Non esegue la funzione la prima volta che faccio il check */
-    const checkInc = (inc, cod) => {
-
-        console.log("Codice nel piano " + cod);
-        console.log(props.courses.propedeuticità);
-        console.log(props.courses.propedeuticità);
-        console.log(props.courses.propedeuticità !== cod);
-        /* Esame incompatibile, mostrare il messaggio */
-        if (inc.indexOf(props.courses.codice) !== -1) {
-            dis();
-            return false;
-        }
-        /* È presente già un esame con lo stesso codice nel piano */
-        if (cod == props.courses.codice) {
-            dis();
-            return false;
-        }
-        if (props.courses.propedeuticità) {
-            /* Esiste */
-            console.log("Esiste")
-            if (props.courses.propedeuticità !== cod) {
-                dis();
-                return false;
-            }
-        }
-        return true;
-
-
-    };
     const handleOnCheck = () => {
+        let ok = false;
         /* Lo stato non è ancora aggiornato, quindi si prende il precedente (!isChecked) */
         /* Controllare incompatibilità  OK*/
         /* Controllare se esame propedeutico già presente 
@@ -246,25 +264,57 @@ function SelectCheck(props) {
         */
         /* Controllare num massimo studenti iscritti ed aggiornare il numero in tempo reale */
         /* Controllare che l'esame non sia già presente */
-        if (!isChecked) {
-            /* console.log("Codice" + props.courses.codice);
-            console.log("Codice" + props.courses.incompatibilità);
-            console.log(props.courses) */
-            if (props.plan.every((c) => checkInc(c.incompatibilità, c.codice))
-            ) {
+        if (!props.isChecked) {
+            console.log("Codice" + props.courses.codice);
+            //console.log("Codice" + props.courses.incompatibilità);
+            console.log(props.courses)
+            if (props.plan.length > 0) {
+                if (props.plan.every((c) => props.check(c.incompatibilità, c.codice))) {
+                    if (props.courses.propedeuticità) {
+                        if (props.plan.some((c) => props.checkProp(c.codice))) {
+                            props.addCoursePlan(props.courses);
+                            props.incrementCfu(props.courses.crediti);
+                            props.setStatusClass('table-success');
+                        }
+                        else {
+                            props.dis();
+                            props.setStatusClass('table-danger');
+                            props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
+                        }
+                    }
+                    else {
+                        props.addCoursePlan(props.courses);
+                        props.incrementCfu(props.courses.crediti);
+                        props.setStatusClass('table-success');
+                    }
+                }
+            }
+            else if (props.courses.propedeuticità) {
+                props.setStatusClass('table-danger');
+                props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
+                props.dis();
+            }
+            else {
                 props.addCoursePlan(props.courses);
                 props.incrementCfu(props.courses.crediti);
+                props.setStatusClass('table-success');
             }
         }
-        //console.log(props.plan);
-        setIsChecked(!isChecked);
+        props.setIsChecked(!props.isChecked);
     }
+
+
+
+
+    //console.log(props.plan);
+
+
     //console.log(props.plan)
     return (<>
         <Form.Check variant="warning"
             type="checkbox"
-            disabled={disabled}
-            checked={isChecked}
+            disabled={props.disabled}
+            checked={props.isChecked}
             //label={`default ${type}`}
             onChange={handleOnCheck} />
     </>
