@@ -13,12 +13,12 @@ function PlanComponents(props) {
                 <Table className='coltable'>
                     <thead>
                         <tr>
-                            <th>Seleziona</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th>
+                            <th>Elimina</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th>
                         </tr>
                     </thead>
                     <tbody>
                         {props.plan.map((plan, i) =>
-                            <PlanRow plan={plan} key={i} />)}
+                            <PlanRow plan={plan} key={i} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />)}
                     </tbody>
                 </Table>
             </Row>
@@ -32,7 +32,7 @@ function PlanRow(props) {
     return (
         <>
             <tr>
-                <PlanData plan={props.plan} />
+                <PlanData plan={props.plan} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />
             </tr>
         </>
     );
@@ -40,10 +40,11 @@ function PlanRow(props) {
 {/* Aggiungere bottone elimina */ }
 function PlanData(props) {
     /* Implementare la funzione per la delete di un corso se non ci sono vincoli di propedeuticità da rispettare */
+    /* onClick={() => { props.deleteFilm(props.id) }} */
     return (
         <>
             <td>
-                <i className="bi bi-trash" onClick={() => { }} />
+                <i className="bi bi-x-circle-fill" style={{ color: "red" }} onClick={() => { props.deleteFromPlan(props.plan.codice); props.decrementCfu(props.plan.crediti); }}></i>
             </td>
             <td> {props.plan.codice} </td>
             <td> {props.plan.nome} </td>

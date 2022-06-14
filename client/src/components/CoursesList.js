@@ -283,6 +283,7 @@ function SelectCheck(props) {
                         }
                     }
                     else {
+                        props.dis();
                         props.addCoursePlan(props.courses);
                         props.incrementCfu(props.courses.crediti);
                         props.setStatusClass('table-success');
