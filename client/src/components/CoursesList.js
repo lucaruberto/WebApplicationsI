@@ -13,7 +13,7 @@ function PlanPage(props) {
         <>
             <Container fluid  >
                 <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user}
-                    addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} onAdd={props.onAdd} />
+                    addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
                 {
                     props.planExists ? <StudyPlan /> : <> <Row className='below-nav'>
                         <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
@@ -28,6 +28,7 @@ function PlanPage(props) {
         </>)
 }
 function CreatePlan(props) {
+    console.log("Here");
     const [isSwitch1On, setIsSwitch1On] = useState(false);
     const [isSwitch2On, setIsSwitch2On] = useState(true); /* Full-Time selezionato di default */
     const location = useLocation();
@@ -113,7 +114,7 @@ function CoursesList(props) {
                     </Col>
                     <Col md={10}  >
                         <CoursesListTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan}
-                            setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} onAdd={props.onAdd} />
+                            setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
                     </Col>
                 </Row>
                 {/*<Row >
@@ -133,12 +134,12 @@ function CoursesListTable(props) {
                 <Table className='coltable'>
                     <thead>
                         <tr>
-                            {props.onAdd ? <th>Seleziona</th> : ""}<th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th><th>Errori</th>
+                            {props.onAdd ? <th>Aggiungi</th> : ""}<th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th><th>Errori</th>
                         </tr>
                     </thead>
                     <tbody>
                         {props.courses.map((courses, i) =>
-                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} onAdd={props.onAdd} />)}
+                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />)}
                     </tbody>
                 </Table>
             </Row>
@@ -154,7 +155,7 @@ function CoursesRow(props) {
         <>
             <tr className={statusClass}>
                 <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time}
-                    plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} setStatusClass={setStatusClass} message={message} setMessage={setMessage} statusClass={statusClass} onAdd={props.onAdd} />
+                    plan={props.plan} setPlanExists={props.setPlanExists} setStatusClass={setStatusClass} message={message} setMessage={setMessage} statusClass={statusClass} onAdd={props.onAdd} />
             </tr>
         </>
     );
@@ -174,7 +175,7 @@ function CoursesData(props) {
                 props.setStatusClass('table-default');
                 props.setMessage('');
             }
-            if (props.plan.every((c) => check(c.incompatibilità, c.codice))) {
+            else if (!props.courses.propedeuticità && props.plan.every((c) => check(c.incompatibilità, c.codice))) {
                 setDisabled(false);
                 setIsChecked(false);
                 props.setStatusClass('table-default');
@@ -231,7 +232,7 @@ function CoursesData(props) {
     return (
         <>
             {props.onAdd ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses}
-                setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp}
+                setPlanExists={props.setPlanExists} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp}
                 setIsChecked={setIsChecked} disabled={disabled} setDisabled={setDisabled} dis={dis} setStatusClass={props.setStatusClass} setMessage={props.setMessage}
             /></td> : ""}
             <td> {props.courses.codice} </td>
@@ -277,8 +278,8 @@ function SelectCheck(props) {
                 if (props.plan.every((c) => props.check(c.incompatibilità, c.codice))) {
                     if (props.courses.propedeuticità) {
                         if (props.plan.some((c) => props.checkProp(c.codice))) {
+                            props.dis();
                             props.addCoursePlan(props.courses);
-                            props.incrementCfu(props.courses.crediti);
                             props.setStatusClass('table-success');
                         }
                         else {
@@ -290,7 +291,6 @@ function SelectCheck(props) {
                     else {
                         props.dis();
                         props.addCoursePlan(props.courses);
-                        props.incrementCfu(props.courses.crediti);
                         props.setStatusClass('table-success');
                     }
                 }
@@ -298,11 +298,10 @@ function SelectCheck(props) {
             else if (props.courses.propedeuticità) {
                 props.setStatusClass('table-danger');
                 props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
-                props.dis();
             }
             else {
+                props.dis();
                 props.addCoursePlan(props.courses);
-                props.incrementCfu(props.courses.crediti);
                 props.setStatusClass('table-success');
             }
         }

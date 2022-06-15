@@ -52,6 +52,7 @@ function App2() {
   }, [loggedIn])*/
 
   function addCoursePlan(course) {
+    incrementCfu(course.crediti);
     setPlan(oldPlan => [...oldPlan, course]);
   }
   /* Dovrei controllare se ci sono propedeuticità */
@@ -64,6 +65,11 @@ function App2() {
       decrementCfu(course.crediti);
     }
   }
+  function addPlan(plan) {
+    API.addPlan(plan)
+      .catch(err => handleError(err));
+  }
+
   function incrementCfu(cfu) {
     setPlanCfu(i => i + cfu);
   }
@@ -112,7 +118,7 @@ function App2() {
           <Route path='add' element={
             loggedIn ? <PlanComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut}
               user={user} addCoursePlan={addCoursePlan} plan={plan} setPlanExists={setPlanExists} incrementCfu={incrementCfu} planCfu={planCfu}
-              time={time} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} /> : <Navigate to='/login' />} />
+              time={time} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} /> : <Navigate to='/login' />} />
           <Route path='update' />
         </Route>
       </Routes>

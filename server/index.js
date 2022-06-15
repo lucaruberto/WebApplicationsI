@@ -91,16 +91,15 @@ app.post('/api/plan', isLoggedIn, [
   }
   //Inserire anche tipologia di piano in user
   // dao.InsertPlanType(full/part ) oppure fare una join in dao
-  const plan = {
-    /* code: req.body.code,
-    score: req.body.score,
-    date: req.body.date, */
-  };
+
 
   try {
     // You may want to check that the course code exists before doing the creation
-    await dao.createPlan(plan, req.user.id);   // It is WRONG to use something different from req.user.id
-    // In case that a new ID is created and you want to use it, take it from await, and return it to client.
+    for (let c of req.body.plan) {
+      console.log(c.codice);
+      await dao.createPlan(c.codice, req.user.id);   // It is WRONG to use something different from req.user.id
+      // In case that a new ID is created and you want to use it, take it from await, and return it to client.
+    }
     res.status(201).end();
   } catch (err) {
     console.log(err);

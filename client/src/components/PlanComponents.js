@@ -3,6 +3,43 @@ import { Form, Button, Container, Table, Row, Col, Stack } from 'react-bootstrap
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 function PlanComponents(props) {
+    const navigate = useNavigate();
+    const handleSubmit = (event) => {
+        let ok = false;
+        event.preventDefault();
+        //ADD
+
+        /* Lunghezza = 0 scarta */
+        /* Controllo con i cfu min e max */
+        /* Controllo lunghezza codice 7 caratteri */
+        /* Controllo nome, crediti, codici esistono */
+        if (props.plan.length > 0) {
+            for (let c of props.plan) {
+                if ((!(c.codice === undefined)) && (!(c.nome === undefined)) && (!(c.crediti === undefined)) && (props.time == 0 || props.time == 1)) {
+
+                    if (props.time == 0 && (props.planCfu >= 20 && props.planCfu <= 40)) {
+                        /* Part Time */
+                        ok = true;
+                    }
+                    else if (props.planCfu >= 60 && props.planCfu <= 80) {
+                        ok = true;
+                    }
+                }
+            }
+        }
+        if (ok) {
+            props.addPlan(props.plan);
+            /* Settare esistenza piano */
+            //navigate(`/home-logged`);
+        }
+        else {
+
+        }
+
+    }
+
+
+
     return (<>
         <Row>
             <h2>Piano degli studi attuale</h2>
@@ -24,10 +61,12 @@ function PlanComponents(props) {
             </Row>
         </Container>
         <Link to="/home-logged">
-            <Button onClick={() => props.setOnAdd(false)} variant="warning">Salva</Button>
+            <Button onClick={handleSubmit} variant="warning">Salva</Button>
         </Link>
     </>);
+    /*  <Button onClick={() => props.setOnAdd(false) } variant="warning">Salva</Button> */
 };
+
 function PlanRow(props) {
     return (
         <>

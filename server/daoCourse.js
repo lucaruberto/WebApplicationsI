@@ -25,9 +25,9 @@ exports.listCourses = () => {
 };
 
 exports.createPlan = (course, userId) => {
-    return new Promise.all((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO Plan(userId, course) VALUES(?, ?)';
-        db.run(sql, [userId, course.codice], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
+        db.run(sql, [userId, course], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
             if (err) {
                 reject(err);
                 return;
