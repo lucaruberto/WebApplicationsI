@@ -13,7 +13,7 @@ function PlanPage(props) {
         <>
             <Container fluid  >
                 <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user}
-                    addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} />
+                    addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} onAdd={props.onAdd} />
                 {
                     props.planExists ? <StudyPlan /> : <> <Row className='below-nav'>
                         <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
@@ -93,9 +93,10 @@ function CoursesList(props) {
                     <Navbar bg="warning" expand="sm" variant="dark" fixed="top" className="navbar-padding">
 
                         <Navbar.Brand >
-                            <BsCollectionPlay />{" "} Politecnico di Torino
+                            <i className="bi bi-infinity" style={{ color: "black" }}></i>{""} Politecnico di Torino
                         </Navbar.Brand>
                         <Nav.Link href="/" style={{ color: "white" }} >Home</Nav.Link>
+                        <Nav.Link href="/home-logged" style={{ color: "white" }} >Pagina Personale</Nav.Link>
                         <Form className="my-2 my-lg-0 mx-auto d-sm-block"  >
                         </Form>
                         <Nav >
@@ -112,7 +113,7 @@ function CoursesList(props) {
                     </Col>
                     <Col md={10}  >
                         <CoursesListTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan}
-                            setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} />
+                            setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} onAdd={props.onAdd} />
                     </Col>
                 </Row>
                 {/*<Row >
@@ -132,12 +133,12 @@ function CoursesListTable(props) {
                 <Table className='coltable'>
                     <thead>
                         <tr>
-                            <th>Seleziona</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th><th>Errori</th>
+                            {props.onAdd ? <th>Seleziona</th> : ""}<th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th><th>Errori</th>
                         </tr>
                     </thead>
                     <tbody>
                         {props.courses.map((courses, i) =>
-                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} />)}
+                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} onAdd={props.onAdd} />)}
                     </tbody>
                 </Table>
             </Row>
@@ -153,18 +154,18 @@ function CoursesRow(props) {
         <>
             <tr className={statusClass}>
                 <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time}
-                    plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} setStatusClass={setStatusClass} message={message} setMessage={setMessage} />
+                    plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} setStatusClass={setStatusClass} message={message} setMessage={setMessage} statusClass={statusClass} onAdd={props.onAdd} />
             </tr>
         </>
     );
 }
 function CoursesData(props) {
-    let cnt = 0;
     const [isChecked, setIsChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
-
+    /* Fare il nuovo check delle incompatibilità in seguito all'eliminazione di un esame */
     useEffect(() => {
-        if (disabled) {
+        //.log(props.statusClass);
+        if (disabled && props.statusClass != "table-success") {
             /* Si toglie il disabilitato dopo la useEffect e quando ci sono incompatibilità */
             /* Controllare le incompatibilità in seguito alla delete */
             if (props.courses.propedeuticità && props.plan.some((c) => checkProp(c.codice))) {
@@ -173,17 +174,33 @@ function CoursesData(props) {
                 props.setStatusClass('table-default');
                 props.setMessage('');
             }
+            if (props.plan.every((c) => check(c.incompatibilità, c.codice))) {
+                setDisabled(false);
+                setIsChecked(false);
+                props.setStatusClass('table-default');
+                props.setMessage('');
+            }
+
+        }
+        else if (props.statusClass == "table-success") {
+            /* Se non è piuù presente nella lista */
+            if (!props.plan.some((c) => c.codice == props.courses.codice)) {
+                setDisabled(false);
+                setIsChecked(false);
+                props.setStatusClass('table-default');
+            }
+        }
+        else if (props.statusClass == "table-danger") {
 
         }
     }, [props.plan.length]);
+
     const checkProp = (cod) => {
         if (props.courses.propedeuticità == cod) {
             return true;
         }
         return false;
     }
-
-
     const check = (inc, cod) => {
         //console.log("Esame: " + props.courses.name);
         //console.log("Esame: " + props.courses.codice);
@@ -201,7 +218,6 @@ function CoursesData(props) {
             props.setMessage("Corso già presente all'interno del piano");
             return false;
         }
-
         setDisabled(false);
         setIsChecked(false);
         props.setStatusClass('table-default');
@@ -214,10 +230,10 @@ function CoursesData(props) {
     }
     return (
         <>
-            <td> <SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses}
+            {props.onAdd ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses}
                 setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp}
                 setIsChecked={setIsChecked} disabled={disabled} setDisabled={setDisabled} dis={dis} setStatusClass={props.setStatusClass} setMessage={props.setMessage}
-            /></td>
+            /></td> : ""}
             <td> {props.courses.codice} </td>
             <td> {props.courses.nome} </td>
             <td> {props.courses.crediti} </td>
@@ -256,18 +272,7 @@ function CoursesData(props) {
 
 function SelectCheck(props) {
     const handleOnCheck = () => {
-        let ok = false;
-        /* Lo stato non è ancora aggiornato, quindi si prende il precedente (!isChecked) */
-        /* Controllare incompatibilità  OK*/
-        /* Controllare se esame propedeutico già presente 
-            Nel caso non fare check/inserire, segnalare l'errore ma non disabilitare
-        */
-        /* Controllare num massimo studenti iscritti ed aggiornare il numero in tempo reale */
-        /* Controllare che l'esame non sia già presente */
         if (!props.isChecked) {
-            console.log("Codice" + props.courses.codice);
-            //console.log("Codice" + props.courses.incompatibilità);
-            console.log(props.courses)
             if (props.plan.length > 0) {
                 if (props.plan.every((c) => props.check(c.incompatibilità, c.codice))) {
                     if (props.courses.propedeuticità) {
@@ -303,14 +308,6 @@ function SelectCheck(props) {
         }
         props.setIsChecked(!props.isChecked);
     }
-
-
-
-
-    //console.log(props.plan);
-
-
-    //console.log(props.plan)
     return (<>
         <Form.Check variant="warning"
             type="checkbox"

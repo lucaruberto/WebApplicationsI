@@ -44,7 +44,7 @@ function PlanData(props) {
     return (
         <>
             <td>
-                <i className="bi bi-x-circle-fill" style={{ color: "red" }} onClick={() => { props.deleteFromPlan(props.plan.codice); props.decrementCfu(props.plan.crediti); }}></i>
+                <i className="bi bi-x-circle-fill" style={{ color: "red" }} onClick={() => { props.deleteFromPlan(props.plan) }}></i>
             </td>
             <td> {props.plan.codice} </td>
             <td> {props.plan.nome} </td>

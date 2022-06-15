@@ -54,8 +54,15 @@ function App2() {
   function addCoursePlan(course) {
     setPlan(oldPlan => [...oldPlan, course]);
   }
-  function deleteFromPlan(codice) {
-    setPlan((oldPlan) => oldPlan.filter((c) => c.codice !== codice));
+  /* Dovrei controllare se ci sono propedeuticità */
+  function deleteFromPlan(course) {
+    if (plan.some((c) => c.propedeuticità === course.codice)) {
+      setMessage("Non è possibile cancellare l'esame per propedeuticità");
+    }
+    else {
+      setPlan((oldPlan) => oldPlan.filter((c) => c.codice !== course.codice));
+      decrementCfu(course.crediti);
+    }
   }
   function incrementCfu(cfu) {
     setPlanCfu(i => i + cfu);
@@ -90,13 +97,12 @@ function App2() {
     await API.logOut();
     setLoggedIn(false);
     setUser({});
-
     navigate('/');
   }
   return (
     <>
       <Routes>
-        <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} />} />
+        <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} plan={plan} />} />
         <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime}
