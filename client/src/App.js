@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import './App.css';
-import { LoginForm, LogoutButton } from './components/LoginComponents';
+import { LoginForm } from './components/LoginComponents';
 import { Container } from 'react-bootstrap/';
 import { useEffect, useState } from 'react';
 import API from './API';
@@ -20,13 +20,14 @@ function App2() {
   const [courses, setCourses] = useState([]); //Lista di corsi versione Client-Server
   const [loggedIn, setLoggedIn] = useState(false);  // no user is logged in when app loads
   const [user, setUser] = useState({});
-  const [planExists, setPlanExists] = useState(false);
+  const [planExists, setPlanExists] = useState('');
   const [planCfu, setPlanCfu] = useState(0);
   const [message, setMessage] = useState('');
   const [dirty, setDirty] = useState(true);
   const [onAdd, setOnAdd] = useState(false);
   const [time, setTime] = useState(''); /* 1 = Full Time, 0 = Part Time */
   const [plan, setPlan] = useState([]);
+  const [actualPlan, setActualPlan] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,11 +66,26 @@ function App2() {
       decrementCfu(course.crediti);
     }
   }
-  function addPlan(plan) {
-    API.addPlan(plan)
-      .catch(err => handleError(err));
-  }
+  useEffect(() => {
+    if (loggedIn) {
+      /*(plan) => setPlan(plan)  */
+      API.getPlanExists().then((p) => setPlanExists(p));
+      API.getPlan().then((plan) => setActualPlan(plan))
+        .catch(err => handleError(err));
+    }
+  }, [loggedIn, onAdd]);
 
+  /* useEffect(() => {
+    if (!loggedIn) {
+      //(plan) => setPlan(plan)  
+      setOnAdd(false);
+    }
+  }, [loggedIn]); */
+
+  function addPlan(plan) {
+    API.addPlan(plan).then()
+      .catch(err => handleError(err));
+  };
   function incrementCfu(cfu) {
     setPlanCfu(i => i + cfu);
   }
@@ -77,9 +93,10 @@ function App2() {
     setPlanCfu(i => i - cfu);
   }
   useEffect(() => {
+    /* setCourses(list.nome.sort((Architetture, Database) => Architetture - Database))  */
     API.getAllCourses().then((list) => { setCourses(list) })
       .catch(err => handleError(err))
-  }, [])
+  }, [loggedIn])
 
   function handleError(err) {
     console.log(err);
@@ -117,7 +134,7 @@ function App2() {
         /> : <Navigate to='/login' />} >
           <Route path='add' element={
             loggedIn ? <PlanComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut}
-              user={user} addCoursePlan={addCoursePlan} plan={plan} setPlanExists={setPlanExists} incrementCfu={incrementCfu} planCfu={planCfu}
+              user={user} addCoursePlan={addCoursePlan} plan={plan} setPlan={setPlan} setPlanExists={setPlanExists} incrementCfu={incrementCfu} planCfu={planCfu}
               time={time} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} /> : <Navigate to='/login' />} />
           <Route path='update' />
         </Route>

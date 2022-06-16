@@ -60,9 +60,18 @@ function PlanComponents(props) {
                 </Table>
             </Row>
         </Container>
-        <Link to="/home-logged">
-            <Button onClick={handleSubmit} variant="warning">Salva</Button>
-        </Link>
+        <Row>
+            <Col xs={1}>
+                <Link to="/home-logged">
+                    <Button onClick={handleSubmit} variant="success">Salva</Button>
+                </Link>
+            </Col>
+            <Col xs={1}>
+                <Link to="/home-logged/add">
+                    <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Annulla</Button>
+                </Link>
+            </Col>
+        </Row>
     </>);
     /*  <Button onClick={() => props.setOnAdd(false) } variant="warning">Salva</Button> */
 };
@@ -110,11 +119,11 @@ function PlanNumberStudents(props) {
     return (
         <>
             <Stack direction="horizontal" gap={5}>
-                <div >Cfu Attuali</div>
+                <div>Cfu Attuali</div>
                 <div>{props.planCfu}</div>
-                <div >Min Cfu</div>
+                <div>Min Cfu</div>
                 <div>{cfuMin}</div>
-                <div >Max Cfu</div>
+                <div>Max Cfu</div>
                 <div>{cfuMax}</div>
             </Stack>
         </>);

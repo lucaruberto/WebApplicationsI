@@ -2,11 +2,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Container, Table, Row, Col, Button, Navbar, Form, Nav, Accordion } from "react-bootstrap";
 import React from "react";
-import { BsCollectionPlay } from "react-icons/bs";
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate, Link, useLocation, Outlet } from 'react-router-dom';
 import { LogoutButton } from './LoginComponents';
-
+import { PlanComponents } from './PlanComponents';
+import API from '../API';
 function PlanPage(props) {
     /* Sistemare la pagina nel caso il piano esiste già -> props.planExists */
     return (
@@ -15,12 +15,14 @@ function PlanPage(props) {
                 <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user}
                     addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
                 {
-                    props.planExists ? <StudyPlan /> : <> <Row className='below-nav'>
-                        <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
-                        <Col md={10} >
-                            {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} />}
-                        </Col>
-                    </Row>
+                    props.planExists ? <PlanComponents setOnAdd={props.setOnAdd} loggedIn={props.loggedIn} logout={props.doLogOut}
+                        user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu}
+                        time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} /> : <> <Row className='below-nav'>
+                            <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
+                            <Col md={10} >
+                                {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} />}
+                            </Col>
+                        </Row>
                     </>
                 }
             </Container>
@@ -28,7 +30,6 @@ function PlanPage(props) {
         </>)
 }
 function CreatePlan(props) {
-    console.log("Here");
     const [isSwitch1On, setIsSwitch1On] = useState(false);
     const [isSwitch2On, setIsSwitch2On] = useState(true); /* Full-Time selezionato di default */
     const location = useLocation();
@@ -86,7 +87,6 @@ function StudyPlan(props) {
 
 function CoursesList(props) {
     const navigate = useNavigate();
-
     return (
         <>
             <Container fluid>
@@ -166,7 +166,7 @@ function CoursesData(props) {
     /* Fare il nuovo check delle incompatibilità in seguito all'eliminazione di un esame */
     useEffect(() => {
         //.log(props.statusClass);
-        if (disabled && props.statusClass != "table-success") {
+        if (disabled && props.statusClass !== "table-success") {
             /* Si toglie il disabilitato dopo la useEffect e quando ci sono incompatibilità */
             /* Controllare le incompatibilità in seguito alla delete */
             if (props.courses.propedeuticità && props.plan.some((c) => checkProp(c.codice))) {
@@ -183,29 +183,26 @@ function CoursesData(props) {
             }
 
         }
-        else if (props.statusClass == "table-success") {
+        else if (props.statusClass === "table-success") {
             /* Se non è piuù presente nella lista */
-            if (!props.plan.some((c) => c.codice == props.courses.codice)) {
+            if (!props.plan.some((c) => c.codice === props.courses.codice)) {
                 setDisabled(false);
                 setIsChecked(false);
                 props.setStatusClass('table-default');
             }
         }
-        else if (props.statusClass == "table-danger") {
+        else if (props.statusClass === "table-danger") {
 
         }
-    }, [props.plan.length]);
+    }, [props.plan.length, props]);
 
     const checkProp = (cod) => {
-        if (props.courses.propedeuticità == cod) {
+        if (props.courses.propedeuticità === cod) {
             return true;
         }
         return false;
     }
     const check = (inc, cod) => {
-        //console.log("Esame: " + props.courses.name);
-        //console.log("Esame: " + props.courses.codice);
-        /* Esame incompatibile, mostrare il messaggio */
         if (inc.indexOf(props.courses.codice) !== -1) {
             dis();
             props.setStatusClass('table-danger');
@@ -213,7 +210,7 @@ function CoursesData(props) {
             return false;
         }
         /* È presente già un esame con lo stesso codice nel piano */
-        if (cod == props.courses.codice) {
+        if (cod === props.courses.codice) {
             dis();
             props.setStatusClass('table-danger');
             props.setMessage("Corso già presente all'interno del piano");

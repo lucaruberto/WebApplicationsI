@@ -82,8 +82,39 @@ app.get('/api/courses', (req, res) => {
     .catch(() => res.status(500).end());
 });
 
+// GET /api/plan
+app.get('/api/plan', isLoggedIn, async (req, res) => {
+  try {
+    const result = await dao.getPlan(req.user.id);
+    if (result.error)
+      res.status(404).json(result);
+    else
+      res.json(result);
+  } catch (err) {
+    res.status(500).end();
+  }
+});
+// GET /api/planExists
+app.get('/api/planExists', isLoggedIn, async (req, res) => {
+  try {
+    const result = await dao.getPlanExists(req.user.id);
+    if (result.error)
+      res.status(404).json(result);
+    else
+      res.json(result);
+  } catch (err) {
+    res.status(500).end();
+  }
+});
+
+/* check('plan').custom((value) => {
+  value.forEach(); /* Controllo esistenza e lunghezza codice */
+//value.forEach(); /* Controllo esistenza nome */
+/* Controllo compatibilità */
+/* Controllo incompatibilità */
+
 // POST /api/plan
-app.post('/api/plan', isLoggedIn, [
+app.post('/api/plan', isLoggedIn, [check('plan').isArray()
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -100,6 +131,7 @@ app.post('/api/plan', isLoggedIn, [
       await dao.createPlan(c.codice, req.user.id);   // It is WRONG to use something different from req.user.id
       // In case that a new ID is created and you want to use it, take it from await, and return it to client.
     }
+    dao.addPlanFlag(req.user.id);
     res.status(201).end();
   } catch (err) {
     console.log(err);
