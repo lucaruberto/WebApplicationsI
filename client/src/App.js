@@ -128,15 +128,14 @@ function App2() {
         <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} plan={plan} />} />
         <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
-          planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime}
+          planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} actualPlan={actualPlan}
           onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} incrementCfu={incrementCfu}
 
         /> : <Navigate to='/login' />} >
-          <Route path='add' element={
+          <Route path='edit' element={
             loggedIn ? <PlanComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut}
               user={user} addCoursePlan={addCoursePlan} plan={plan} setPlan={setPlan} setPlanExists={setPlanExists} incrementCfu={incrementCfu} planCfu={planCfu}
-              time={time} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} /> : <Navigate to='/login' />} />
-          <Route path='update' />
+              time={time} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} planExists={planExists} /> : <Navigate to='/login' />} />
         </Route>
       </Routes>
 

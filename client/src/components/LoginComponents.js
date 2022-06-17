@@ -1,6 +1,5 @@
 import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
-
 function LoginForm(props) {
   const [username, setUsername] = useState('student@studenti.polito.it');
   const [password, setPassword] = useState('password');

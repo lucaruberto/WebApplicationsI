@@ -8,7 +8,7 @@ async function getAllCourses() {
     const coursesJson = await response.json();
     let courses = coursesJson.map((c) => ({
         codice: c.codice, nome: c.nome, crediti: c.crediti, iscritti: c.iscritti === null ? 0 : c.iscritti, maxstudenti: c.maxstudenti === null ? 0 : c.maxstudenti,
-        incompatibilità: c.incompatibilità === null ? 0 : c.incompatibilità, propedeuticità: c.propedeuticità === null ? 0 : c.propedeuticità
+        incompatibilità: !c.incompatibilità ? "" : c.incompatibilità, propedeuticità: !c.propedeuticità ? "" : c.propedeuticità
     })).sort(function (a, b) {
         const nomeA = a.nome.trim().toUpperCase();
         const nomeB = b.nome.trim().toUpperCase();

@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { Form, Button, Container, Table, Row, Col, Stack } from 'react-bootstrap';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Button, Container, Table, Row, Col, Stack } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 function PlanComponents(props) {
-    const navigate = useNavigate();
     const handleSubmit = (event) => {
         let ok = false;
         event.preventDefault();
@@ -15,9 +14,9 @@ function PlanComponents(props) {
         /* Controllo nome, crediti, codici esistono */
         if (props.plan.length > 0) {
             for (let c of props.plan) {
-                if ((!(c.codice === undefined)) && (!(c.nome === undefined)) && (!(c.crediti === undefined)) && (props.time == 0 || props.time == 1)) {
+                if ((!(c.codice === undefined)) && (!(c.nome === undefined)) && (!(c.crediti === undefined)) && (props.time === 0 || props.time === 1)) {
 
-                    if (props.time == 0 && (props.planCfu >= 20 && props.planCfu <= 40)) {
+                    if (props.time === 0 && (props.planCfu >= 20 && props.planCfu <= 40)) {
                         /* Part Time */
                         ok = true;
                     }
@@ -29,49 +28,72 @@ function PlanComponents(props) {
         }
         if (ok) {
             props.addPlan(props.plan);
+            props.setOnAdd(false);
             /* Settare esistenza piano */
             //navigate(`/home-logged`);
         }
         else {
 
         }
-
     }
+    console.log(props.planExists);
 
 
 
     return (<>
-        <Row>
-            <h2>Piano degli studi attuale</h2>
-        </Row>
-        <Row ><PlanNumberStudents planCfu={props.planCfu} time={props.time} /></Row>
-        <Container fluid>
-            <Row>
-                <Table className='coltable'>
-                    <thead>
-                        <tr>
-                            <th>Elimina</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {props.plan.map((plan, i) =>
-                            <PlanRow plan={plan} key={i} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />)}
-                    </tbody>
-                </Table>
-            </Row>
-        </Container>
-        <Row>
-            <Col xs={1}>
-                <Link to="/home-logged">
-                    <Button onClick={handleSubmit} variant="success">Salva</Button>
-                </Link>
-            </Col>
-            <Col xs={1}>
-                <Link to="/home-logged/add">
-                    <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Annulla</Button>
-                </Link>
-            </Col>
-        </Row>
+        <Col md={10} >
+            <h1> {props.planExists ? ("Piano degli studi di: " + props.user?.name) : "Nuovo Piano degli studi"} {""}
+                {props.planExists ? (props.planExists === 1 ? "(Part Time)" : "(Full Time)") : props.time === 0 ? "(Part Time)" : "(Full Time)"}</h1>
+
+        </Col>
+        <Col md={10}  >
+            <PlanNumberStudents planCfu={props.planCfu} time={props.time} planExists={props.planExists} />
+            <Container fluid>
+                <Row>
+                    <Table className='coltable'>
+                        <thead>
+                            <tr>
+                                <th>Elimina</th><th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {props.planExists ? props.actualPlan.map((plan, i) =>
+                                <PlanRow plan={plan} key={i} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />) :
+                                props.plan.map((plan, i) =>
+                                    <PlanRow plan={plan} key={i} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />)}
+                        </tbody>
+                    </Table>
+                </Row>
+            </Container>
+            {props.onAdd ? <Row>
+
+                <Col xs={1}>
+                    <Link to="/home-logged">
+                        <Button onClick={handleSubmit} variant="success">Salva</Button>
+                    </Link>
+                </Col>
+                <Col xs={1}>
+                    <Link to="/home-logged/add">
+                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Annulla</Button>
+                    </Link>
+                </Col></Row> : <Row><Col xs={1}>
+                    <Link to="/home-logged">
+                        <Button onClick={handleSubmit} variant="success">Salva</Button>
+                    </Link>
+                </Col>
+                <Col xs={1}>
+                    <Link to="/home-logged/add">
+                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="warning">Annulla</Button>
+                    </Link>
+                </Col>
+                <Col xs={1}>
+                    <Link to="/home-logged/add">
+                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Elimina</Button>
+                    </Link>
+                </Col></Row>
+
+            }
+        </Col>
     </>);
     /*  <Button onClick={() => props.setOnAdd(false) } variant="warning">Salva</Button> */
 };
@@ -85,7 +107,6 @@ function PlanRow(props) {
         </>
     );
 };
-{/* Aggiungere bottone elimina */ }
 function PlanData(props) {
     /* Implementare la funzione per la delete di un corso se non ci sono vincoli di propedeuticità da rispettare */
     /* onClick={() => { props.deleteFilm(props.id) }} */
@@ -109,10 +130,10 @@ function PlanNumberStudents(props) {
         color: 'black',
         border: "2px solid orange"
     };
-    if (props.time == 0) {
+    if (props.time === 0) {
         cfuMin = 20; cfuMax = 40;
     }
-    else if (props.time == 1) {
+    else if (props.time === 1) {
         cfuMin = 60; cfuMax = 80;
     }
 
@@ -140,28 +161,5 @@ function Cfu(props) {
         </div>
     );
 };
-/* Min Cfu depends on Plan Full/Part Time */
-function CfuMin(props) {
-    const divStyle = {
-        color: 'black',
-        border: "2px solid black"
-    };
-    return (
-        <div  >
-            1
-        </div>
-    );
-};
-/* Max Cfu depends on Plan Full/Part Time */
-function CfuMax(props) {
-    const divStyle = {
-        color: 'black',
-        border: "2px solid black"
-    };
-    return (
-        <div  >
-            1
-        </div>
-    );
-};
+
 export { PlanComponents };

@@ -6,45 +6,50 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation, Outlet } from 'react-router-dom';
 import { LogoutButton } from './LoginComponents';
 import { PlanComponents } from './PlanComponents';
-import API from '../API';
+
 function PlanPage(props) {
-    /* Sistemare la pagina nel caso il piano esiste già -> props.planExists */
+    console.log(props.planExists)
     return (
         <>
             <Container fluid  >
                 <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user}
                     addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
                 {
-                    props.planExists ? <PlanComponents setOnAdd={props.setOnAdd} loggedIn={props.loggedIn} logout={props.doLogOut}
-                        user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu}
-                        time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} /> : <> <Row className='below-nav'>
-                            <Col md={2}> <h1>Crea un nuovo piano degli studi </h1> </Col>
-                            <Col md={10} >
-                                {props.onAdd ? <Outlet /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} />}
-                            </Col>
-                        </Row>
+                    <> <Row className='below-nav'>
+                        <Col md={2}> <h1>{props.planExists ? "Aggiorna il piano di studi" : "Crea un nuovo piano di studi"}</h1> </Col>
+                        <Col md={10}>
+                            {props.onAdd || props.planExists ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan}
+                                user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu}
+                                time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} planExists={props.planExists} /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} planExists={props.planExists} />}
+                        </Col>
+                    </Row>
                     </>
                 }
             </Container>
 
         </>)
 }
+
+
+
 function CreatePlan(props) {
     const [isSwitch1On, setIsSwitch1On] = useState(false);
     const [isSwitch2On, setIsSwitch2On] = useState(true); /* Full-Time selezionato di default */
     const location = useLocation();
     const onSwitch1Action = () => {
         setIsSwitch1On(!isSwitch1On);
+        setIsSwitch2On(false);
     };
     const onSwitch2Action = () => {
         setIsSwitch2On(!isSwitch2On);
+        setIsSwitch1On(false);
     };
     const handleSubmit = () => {
         props.setOnAdd(true);
         if (isSwitch1On)
-            props.setTime(0)
+            props.setTime(0) /* Part Time */
         else
-            props.setTime(1)
+            props.setTime(1) /* Full Time */
     }
 
     return (
@@ -59,7 +64,7 @@ function CreatePlan(props) {
                                 label="Part Time (40-60 cfu)"
                                 name="group1"
                                 checked={isSwitch1On}
-                                disabled={isSwitch2On}
+
                                 type="checkbox"
                                 id={`inline-1`}
                             />
@@ -69,7 +74,7 @@ function CreatePlan(props) {
                                 name="group1"
                                 type="checkbox"
                                 checked={isSwitch2On}
-                                disabled={isSwitch1On}
+
                                 id={`inline-2`}
                             /> </div> </Form>
                 </Col>
@@ -114,7 +119,7 @@ function CoursesList(props) {
                     </Col>
                     <Col md={10}  >
                         <CoursesListTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan}
-                            setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
+                            setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} planExists={props.planExists} />
                     </Col>
                 </Row>
                 {/*<Row >
@@ -134,7 +139,7 @@ function CoursesListTable(props) {
                 <Table className='coltable'>
                     <thead>
                         <tr>
-                            {props.onAdd ? <th>Aggiungi</th> : ""}<th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th><th>Errori</th>
+                            {(props.onAdd || props.planExists) ? <th>Aggiungi</th> : ""}<th>Codice</th><th>Nome</th><th>Crediti</th><th>Numero iscritti</th><th>Max Studenti</th><th>Dettagli</th><th>Errori</th>
                         </tr>
                     </thead>
                     <tbody>
