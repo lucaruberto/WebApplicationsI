@@ -68,8 +68,8 @@ function App2() {
   }
   useEffect(() => {
     if (loggedIn) {
-      /*(plan) => setPlan(plan)  */
-      API.getPlanExists().then((p) => setPlanExists(p));
+      /*Funzione che conta il numero di crediti  */
+      API.getPlanExists().then((p) => { if (p.plan > 0) setPlanExists(p.plan); setPlanCfu(p.cfu) });
       API.getPlan().then((plan) => setActualPlan(plan))
         .catch(err => handleError(err));
     }
@@ -82,8 +82,12 @@ function App2() {
     }
   }, [loggedIn]); */
 
-  function addPlan(plan) {
-    API.addPlan(plan).then()
+  function addPlan(plan, time) {
+    API.addPlan(plan, time).then()
+      .catch(err => handleError(err));
+  };
+  function deletePlan(plan) {
+    API.deletePlan(plan, planCfu, time).then()
       .catch(err => handleError(err));
   };
   function incrementCfu(cfu) {
@@ -128,14 +132,10 @@ function App2() {
         <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} plan={plan} />} />
         <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
-          planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} actualPlan={actualPlan}
+          planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} actualPlan={actualPlan} deletePlan={deletePlan}
           onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} incrementCfu={incrementCfu}
-
+          setPlan={setPlan} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan}
         /> : <Navigate to='/login' />} >
-          <Route path='edit' element={
-            loggedIn ? <PlanComponents setOnAdd={setOnAdd} courses={courses} loggedIn={loggedIn} logout={doLogOut}
-              user={user} addCoursePlan={addCoursePlan} plan={plan} setPlan={setPlan} setPlanExists={setPlanExists} incrementCfu={incrementCfu} planCfu={planCfu}
-              time={time} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} planExists={planExists} /> : <Navigate to='/login' />} />
         </Route>
       </Routes>
 

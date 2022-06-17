@@ -27,7 +27,7 @@ function PlanComponents(props) {
             }
         }
         if (ok) {
-            props.addPlan(props.plan);
+            props.addPlan(props.plan, props.time);
             props.setOnAdd(false);
             /* Settare esistenza piano */
             //navigate(`/home-logged`);
@@ -36,7 +36,6 @@ function PlanComponents(props) {
 
         }
     }
-    console.log(props.planExists);
 
 
 
@@ -65,7 +64,7 @@ function PlanComponents(props) {
                     </Table>
                 </Row>
             </Container>
-            {props.onAdd ? <Row>
+            {!props.planExists ? <Row>
 
                 <Col xs={1}>
                     <Link to="/home-logged">
@@ -88,7 +87,7 @@ function PlanComponents(props) {
                 </Col>
                 <Col xs={1}>
                     <Link to="/home-logged/add">
-                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Elimina</Button>
+                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.deletePlan() }} variant="danger">Elimina</Button>
                     </Link>
                 </Col></Row>
 

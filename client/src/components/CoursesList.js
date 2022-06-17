@@ -8,7 +8,6 @@ import { LogoutButton } from './LoginComponents';
 import { PlanComponents } from './PlanComponents';
 
 function PlanPage(props) {
-    console.log(props.planExists)
     return (
         <>
             <Container fluid  >
@@ -79,9 +78,8 @@ function CreatePlan(props) {
                             /> </div> </Form>
                 </Col>
                 <Col >
-                    <Link to="add" state={{ nextpage: location.pathname }} >
-                        <Button variant="warning" size="lg" className="fixed-right-bottom" onClick={handleSubmit} > Crea </Button>
-                    </Link> </Col>
+                    <Button variant="warning" size="lg" className="fixed-right-bottom" onClick={handleSubmit} > Crea </Button>
+                </Col>
             </Row>
         </>
     );

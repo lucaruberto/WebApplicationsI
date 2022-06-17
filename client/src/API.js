@@ -41,15 +41,15 @@ async function getPlan() {
 async function getPlanExists() {
     const response = await fetch(new URL('planExists', APIURL), { credentials: 'include' });
     const planExists = await response.json();
-    const p = planExists.plan;
+
     if (response.ok) {
-        return p
+        return planExists
     } else {
-        throw p;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
+        throw planExists;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
     }
 }
 
-function addPlan(plan) {
+function addPlan(plan, planCfu, time) {
     return new Promise((resolve, reject) => {
         fetch(new URL('plan', APIURL), {
             method: 'POST',
@@ -58,7 +58,8 @@ function addPlan(plan) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                plan: plan
+                plan: plan,
+                time: time
             }),
         })
             .then((response) => {
@@ -72,9 +73,25 @@ function addPlan(plan) {
                 }
             }).catch(() => { reject({ error: "Cannot communicate with the server." }) }); // connection errors
     });
-
-
 }
+function deletePlan() {
+    return new Promise((resolve, reject) => {
+        fetch(new URL('plan', APIURL), {
+            method: 'DELETE',
+            credentials: 'include',
+        }).then((response) => {
+            if (response.ok) {
+                resolve(null);
+            } else {
+                // analyze the cause of error
+                response.json()
+                    .then((message) => { reject(message); }) // error message in the response body
+                    .catch(() => { reject({ error: "Cannot parse server response." }) }); // something else
+            }
+        }).catch(() => { reject({ error: "Cannot communicate with the server." }) }); // connection errors
+    });
+}
+
 async function logIn(credentials) {
     let response = await fetch(new URL('sessions', APIURL), {
         method: 'POST',
@@ -107,5 +124,5 @@ async function getUserInfo() {
     }
 }
 
-const API = { getAllCourses, logIn, logOut, getUserInfo, addPlan, getPlan, getPlanExists };
+const API = { getAllCourses, logIn, logOut, getUserInfo, addPlan, getPlan, getPlanExists, deletePlan };
 export default API;

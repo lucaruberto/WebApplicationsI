@@ -131,7 +131,7 @@ app.post('/api/plan', isLoggedIn, [check('plan').isArray()
       await dao.createPlan(c.codice, req.user.id);   // It is WRONG to use something different from req.user.id
       // In case that a new ID is created and you want to use it, take it from await, and return it to client.
     }
-    dao.addPlanFlag(req.user.id);
+    await dao.addPlanFlag(req.user.id, req.body.time);
     res.status(201).end();
   } catch (err) {
     console.log(err);
@@ -153,11 +153,11 @@ app.delete('/api/plan/:course', isLoggedIn, async (req, res) => {
 // DELETE /api/plan/
 app.delete('/api/plan', isLoggedIn, async (req, res) => {
   try {
-    await dao.deletePlan(req.params.code, req.user.id);
+    await dao.deletePlan(req.user.id);
     res.status(204).end();
   } catch (err) {
     console.log(err);
-    res.status(503).json({ error: `Database error during the deletion of Plan ${req.params.code}.` });
+    res.status(503).json({ error: `Database error during the deletion of Plan for the user ${req.user.id}.` });
   }
 });
 /*** Users APIs ***/

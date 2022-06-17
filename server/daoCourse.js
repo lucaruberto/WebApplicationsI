@@ -23,10 +23,10 @@ exports.listCourses = () => {
         });
     });
 };
-exports.addPlanFlag = (userId) => {
+exports.addPlanFlag = (userId, cfu, time) => {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE User SET plan=? WHERE id = ?';
-        db.run(sql, [1, userId], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
+        db.run(sql, [time, userId], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
             if (err) {
                 reject(err);
                 return;
@@ -37,7 +37,7 @@ exports.addPlanFlag = (userId) => {
 };
 exports.getPlanExists = (userId) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT plan FROM User WHERE id = ?';
+        const sql = 'SELECT plan, cfu FROM User WHERE id = ?';
         db.get(sql, [userId], function (err, row) {
             if (err) {
                 reject(err);
@@ -90,7 +90,7 @@ exports.createPlan = (course, userId) => {
     });
 };
 
-exports.deletePlanCourse = (course, userId) => {
+/* exports.deletePlanCourse = (course, userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM Plan WHERE course = ? AND userid = ?';
         db.run(sql, [course, userId], (err) => {
@@ -101,7 +101,7 @@ exports.deletePlanCourse = (course, userId) => {
                 resolve(null);
         });
     });
-}
+} */
 
 exports.deletePlan = (userId) => {
     return new Promise((resolve, reject) => {
