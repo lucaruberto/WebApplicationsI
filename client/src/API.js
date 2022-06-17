@@ -54,7 +54,7 @@ async function getEnrolled() {
     for (let c of planJson) {
         p.push(c[0].cnt);
     }
-    // console.log(p);
+    //console.log(p);
     if (response.ok) {
         return p;
     } else {

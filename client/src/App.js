@@ -133,7 +133,7 @@ function App2() {
   return (
     <>
       <Routes>
-        <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} plan={plan} />} />
+        <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} plan={plan} enrolled={enrolled} />} />
         <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} actualPlan={actualPlan} deletePlan={deletePlan}
