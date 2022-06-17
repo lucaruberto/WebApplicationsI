@@ -14,9 +14,9 @@ function PlanComponents(props) {
         /* Controllo nome, crediti, codici esistono */
         if (props.plan.length > 0) {
             for (let c of props.plan) {
-                if ((!(c.codice === undefined)) && (!(c.nome === undefined)) && (!(c.crediti === undefined)) && (props.time === 0 || props.time === 1)) {
+                if ((!(c.codice === undefined)) && (!(c.nome === undefined)) && (!(c.crediti === undefined)) && (props.time === 1 || props.time === 2)) {
 
-                    if (props.time === 0 && (props.planCfu >= 20 && props.planCfu <= 40)) {
+                    if (props.time === 1 && (props.planCfu >= 20 && props.planCfu <= 40)) {
                         /* Part Time */
                         ok = true;
                     }
@@ -33,7 +33,7 @@ function PlanComponents(props) {
             //navigate(`/home-logged`);
         }
         else {
-
+            console.log("Errore");
         }
     }
 
@@ -72,7 +72,7 @@ function PlanComponents(props) {
                     </Link>
                 </Col>
                 <Col xs={1}>
-                    <Link to="/home-logged/add">
+                    <Link to="/home-logged">
                         <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Annulla</Button>
                     </Link>
                 </Col></Row> : <Row><Col xs={1}>
@@ -81,12 +81,12 @@ function PlanComponents(props) {
                     </Link>
                 </Col>
                 <Col xs={1}>
-                    <Link to="/home-logged/add">
+                    <Link to="/home-logged">
                         <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="warning">Annulla</Button>
                     </Link>
                 </Col>
                 <Col xs={1}>
-                    <Link to="/home-logged/add">
+                    <Link to="/home-logged">
                         <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.deletePlan() }} variant="danger">Elimina</Button>
                     </Link>
                 </Col></Row>
@@ -129,10 +129,10 @@ function PlanNumberStudents(props) {
         color: 'black',
         border: "2px solid orange"
     };
-    if (props.time === 0) {
+    if (props.time === 1 || props.planExists === 1) {
         cfuMin = 20; cfuMax = 40;
     }
-    else if (props.time === 1) {
+    else if (props.time === 2 || props.planExists === 2) {
         cfuMin = 60; cfuMax = 80;
     }
 

@@ -23,7 +23,7 @@ exports.listCourses = () => {
         });
     });
 };
-exports.addPlanFlag = (userId, cfu, time) => {
+exports.addPlanFlag = (userId, time) => {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE User SET plan=? WHERE id = ?';
         db.run(sql, [time, userId], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
@@ -37,7 +37,7 @@ exports.addPlanFlag = (userId, cfu, time) => {
 };
 exports.getPlanExists = (userId) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT plan, cfu FROM User WHERE id = ?';
+        const sql = 'SELECT plan FROM User WHERE id = ?';
         db.get(sql, [userId], function (err, row) {
             if (err) {
                 reject(err);
@@ -51,7 +51,38 @@ exports.getPlanExists = (userId) => {
         });
     });
 };
-
+exports.getPlanCfu = (userId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT SUM(Crediti) as cfu FROM Course JOIN Plan WHERE userid = ? AND Plan.course=Course.Codice';
+        db.all(sql, [userId], function (err, row) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (row === undefined) {
+                resolve({ error: 'Cfu not found.' });
+            } else {
+                resolve(row);
+            }
+        });
+    });
+};
+exports.getEnrolled = (course) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT COUNT(*) as cnt FROM Plan WHERE course= ?';
+        db.all(sql, [course], function (err, row) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (row === undefined) {
+                resolve({ error: 'Cnt not found.' });
+            } else {
+                resolve(row);
+            }
+        });
+    });
+};
 exports.getPlan = (userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT Codice, Nome, Crediti FROM Course JOIN Plan WHERE Plan.course = Course.Codice AND userid = ?';

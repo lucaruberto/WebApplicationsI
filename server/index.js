@@ -107,12 +107,45 @@ app.get('/api/planExists', isLoggedIn, async (req, res) => {
   }
 });
 
-/* check('plan').custom((value) => {
-  value.forEach(); /* Controllo esistenza e lunghezza codice */
-//value.forEach(); /* Controllo esistenza nome */
-/* Controllo compatibilità */
-/* Controllo incompatibilità */
+app.get('/api/planCfu', isLoggedIn, async (req, res) => {
+  try {
+    const result = await dao.getPlanCfu(req.user.id);
+    if (result.error)
+      res.status(404).json(result);
+    else
+      res.json(result);
+  } catch (err) {
+    res.status(500).end();
+  }
+});
 
+app.get('/api/enrolled', isLoggedIn, async (req, res) => {
+  try {
+    let cnt = [];
+    let courses = await dao.listCourses();
+    courses = courses.sort(function (a, b) {
+      const nomeA = a.nome.trim().toUpperCase();
+      const nomeB = b.nome.trim().toUpperCase();
+      if (nomeA < nomeB) {
+        return -1;
+      }
+      if (nomeA > nomeB) {
+        return 1;
+      }
+      return 0;
+    });;;
+    for (let c of courses) {
+      cnt.push(await dao.getEnrolled(c.codice));
+      //console.log(cnt);
+    }
+    if (cnt.error)
+      res.status(404).json(cnt);
+    else
+      res.json(cnt);
+  } catch (err) {
+    res.status(500).end();
+  }
+});
 // POST /api/plan
 app.post('/api/plan', isLoggedIn, [check('plan').isArray()
 ], async (req, res) => {
@@ -120,16 +153,9 @@ app.post('/api/plan', isLoggedIn, [check('plan').isArray()
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
-  //Inserire anche tipologia di piano in user
-  // dao.InsertPlanType(full/part ) oppure fare una join in dao
-
-
   try {
-    // You may want to check that the course code exists before doing the creation
     for (let c of req.body.plan) {
-      console.log(c.codice);
-      await dao.createPlan(c.codice, req.user.id);   // It is WRONG to use something different from req.user.id
-      // In case that a new ID is created and you want to use it, take it from await, and return it to client.
+      await dao.createPlan(c.codice, req.user.id);
     }
     await dao.addPlanFlag(req.user.id, req.body.time);
     res.status(201).end();
@@ -154,6 +180,7 @@ app.delete('/api/plan/:course', isLoggedIn, async (req, res) => {
 app.delete('/api/plan', isLoggedIn, async (req, res) => {
   try {
     await dao.deletePlan(req.user.id);
+    await dao.addPlanFlag(req.user.id, -1);
     res.status(204).end();
   } catch (err) {
     console.log(err);

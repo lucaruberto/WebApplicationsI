@@ -27,6 +27,7 @@ function App2() {
   const [onAdd, setOnAdd] = useState(false);
   const [time, setTime] = useState(''); /* 1 = Full Time, 0 = Part Time */
   const [plan, setPlan] = useState([]);
+  const [enrolled, setEnrolled] = useState([]);
   const [actualPlan, setActualPlan] = useState([]);
   const navigate = useNavigate();
 
@@ -69,11 +70,14 @@ function App2() {
   useEffect(() => {
     if (loggedIn) {
       /*Funzione che conta il numero di crediti  */
-      API.getPlanExists().then((p) => { if (p.plan > 0) setPlanExists(p.plan); setPlanCfu(p.cfu) });
+      API.getPlanExists().then((p) => { if (p > 0) setPlanExists(p) }).catch(err => handleError(err));;
+      API.getPlanCfu().then((c) => { setPlanCfu(c) }).catch(err => handleError(err));
+      API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
+      //console.log(enrolled);
       API.getPlan().then((plan) => setActualPlan(plan))
         .catch(err => handleError(err));
     }
-  }, [loggedIn, onAdd]);
+  }, [loggedIn, onAdd, time]);
 
   /* useEffect(() => {
     if (!loggedIn) {
@@ -83,11 +87,11 @@ function App2() {
   }, [loggedIn]); */
 
   function addPlan(plan, time) {
-    API.addPlan(plan, time).then()
+    API.addPlan(plan, time).then(() => { setTime(0); setPlanCfu("") })
       .catch(err => handleError(err));
   };
-  function deletePlan(plan) {
-    API.deletePlan(plan, planCfu, time).then()
+  function deletePlan() {
+    API.deletePlan()
       .catch(err => handleError(err));
   };
   function incrementCfu(cfu) {
@@ -134,7 +138,7 @@ function App2() {
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} actualPlan={actualPlan} deletePlan={deletePlan}
           onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} incrementCfu={incrementCfu}
-          setPlan={setPlan} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan}
+          setPlan={setPlan} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} enrolled={enrolled}
         /> : <Navigate to='/login' />} >
         </Route>
       </Routes>

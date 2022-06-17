@@ -8,16 +8,17 @@ import { LogoutButton } from './LoginComponents';
 import { PlanComponents } from './PlanComponents';
 
 function PlanPage(props) {
+    console.log()
     return (
         <>
             <Container fluid  >
-                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user}
+                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user} enrolled={props.enrolled}
                     addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
                 {
                     <> <Row className='below-nav'>
                         <Col md={2}> <h1>{props.planExists ? "Aggiorna il piano di studi" : "Crea un nuovo piano di studi"}</h1> </Col>
                         <Col md={10}>
-                            {props.onAdd || props.planExists ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan}
+                            {props.onAdd || props.planExists ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan} deletePlan={props.deletePlan}
                                 user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu}
                                 time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} planExists={props.planExists} /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} planExists={props.planExists} />}
                         </Col>
@@ -34,7 +35,7 @@ function PlanPage(props) {
 function CreatePlan(props) {
     const [isSwitch1On, setIsSwitch1On] = useState(false);
     const [isSwitch2On, setIsSwitch2On] = useState(true); /* Full-Time selezionato di default */
-    const location = useLocation();
+
     const onSwitch1Action = () => {
         setIsSwitch1On(!isSwitch1On);
         setIsSwitch2On(false);
@@ -46,9 +47,9 @@ function CreatePlan(props) {
     const handleSubmit = () => {
         props.setOnAdd(true);
         if (isSwitch1On)
-            props.setTime(0) /* Part Time */
+            props.setTime(1) /* Part Time */
         else
-            props.setTime(1) /* Full Time */
+            props.setTime(2) /* Full Time */
     }
 
     return (
@@ -116,7 +117,7 @@ function CoursesList(props) {
                         <h1> Elenco dei corsi </h1>
                     </Col>
                     <Col md={10}  >
-                        <CoursesListTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan}
+                        <CoursesListTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan} enrolled={props.enrolled}
                             setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} planExists={props.planExists} />
                     </Col>
                 </Row>
@@ -131,6 +132,8 @@ function CoursesList(props) {
 
 }
 function CoursesListTable(props) {
+    //console.log(props.enrolled[0]);
+    //console.log(props.enrolled[0].cnt);
     return (
         <Container fluid>
             <Row>
@@ -142,7 +145,7 @@ function CoursesListTable(props) {
                     </thead>
                     <tbody>
                         {props.courses.map((courses, i) =>
-                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />)}
+                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} enrolled={props.enrolled[i]} />)}
                     </tbody>
                 </Table>
             </Row>
@@ -157,7 +160,7 @@ function CoursesRow(props) {
     return (
         <>
             <tr className={statusClass}>
-                <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time}
+                <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time} enrolled={props.enrolled}
                     plan={props.plan} setPlanExists={props.setPlanExists} setStatusClass={setStatusClass} message={message} setMessage={setMessage} statusClass={statusClass} onAdd={props.onAdd} />
             </tr>
         </>
@@ -166,7 +169,6 @@ function CoursesRow(props) {
 function CoursesData(props) {
     const [isChecked, setIsChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
-    /* Fare il nuovo check delle incompatibilità in seguito all'eliminazione di un esame */
     useEffect(() => {
         //.log(props.statusClass);
         if (disabled && props.statusClass !== "table-success") {
@@ -238,7 +240,7 @@ function CoursesData(props) {
             <td> {props.courses.codice} </td>
             <td> {props.courses.nome} </td>
             <td> {props.courses.crediti} </td>
-            <td> {props.courses.iscritti} </td>
+            <td> {props.enrolled} </td>
             <td> {props.courses.maxstudenti} </td>
             <td> <Accordion className="accordion-text-width">
                 <Accordion.Item eventKey="0">
@@ -253,20 +255,6 @@ function CoursesData(props) {
             </Accordion>
             </td >
             <td>{props.message}</td>
-
-            {/* <Button variant="info"
-                onClick={() => setOpen(!open)}
-                aria-controls="example-fade-text"
-                aria-expanded={open}
-            >
-                Espandi
-            </Button>
-                <Accordion in={open} >
-                    <div>
-                        Incompatibilità : {props.courses.incompatibilità}
-                        Propedeuticità : {props.courses.propedeuticità ? props.courses.propedeuticità : "-"}
-                    </div>
-    </Accordion> */}
         </>
     );
 }

@@ -37,19 +37,42 @@ async function getPlan() {
         throw planJson;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
     }
 }
-
+async function getPlanCfu() {
+    const response = await fetch(new URL('planCfu', APIURL), { credentials: 'include' });
+    const planJson = await response.json();
+    if (response.ok) {
+        return planJson[0].cfu
+    } else {
+        throw planJson[0].cfu;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
+    }
+}
+async function getEnrolled() {
+    const response = await fetch(new URL('enrolled', APIURL), { credentials: 'include' });
+    const planJson = await response.json();
+    let p = [];
+    /* Array di campi cnt da associare a numero iscritti */
+    for (let c of planJson) {
+        p.push(c[0].cnt);
+    }
+    // console.log(p);
+    if (response.ok) {
+        return p;
+    } else {
+        throw planJson;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
+    }
+}
 async function getPlanExists() {
     const response = await fetch(new URL('planExists', APIURL), { credentials: 'include' });
     const planExists = await response.json();
 
     if (response.ok) {
-        return planExists
+        return planExists.plan
     } else {
-        throw planExists;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
+        throw planExists.plan;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
     }
 }
 
-function addPlan(plan, planCfu, time) {
+function addPlan(plan, time) {
     return new Promise((resolve, reject) => {
         fetch(new URL('plan', APIURL), {
             method: 'POST',
@@ -124,5 +147,5 @@ async function getUserInfo() {
     }
 }
 
-const API = { getAllCourses, logIn, logOut, getUserInfo, addPlan, getPlan, getPlanExists, deletePlan };
+const API = { getAllCourses, logIn, logOut, getUserInfo, addPlan, getPlan, getPlanExists, deletePlan, getPlanCfu, getEnrolled };
 export default API;
