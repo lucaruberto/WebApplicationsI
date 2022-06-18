@@ -94,7 +94,8 @@ app.get('/api/plan', isLoggedIn, async (req, res) => {
     res.status(500).end();
   }
 });
-// GET /api/planExists
+
+/* GET /api/planExists */
 app.get('/api/planExists', isLoggedIn, async (req, res) => {
   try {
     const result = await dao.getPlanExists(req.user.id);
@@ -106,7 +107,7 @@ app.get('/api/planExists', isLoggedIn, async (req, res) => {
     res.status(500).end();
   }
 });
-
+// GET /api/planCfu
 app.get('/api/planCfu', isLoggedIn, async (req, res) => {
   try {
     const result = await dao.getPlanCfu(req.user.id);
@@ -118,7 +119,7 @@ app.get('/api/planCfu', isLoggedIn, async (req, res) => {
     res.status(500).end();
   }
 });
-
+// GET /api/enrolled
 app.get('/api/enrolled', isLoggedIn, async (req, res) => {
   try {
     let cnt = [];

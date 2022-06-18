@@ -68,11 +68,11 @@ function App2() {
     }
   }
   useEffect(() => {
+    API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
     if (loggedIn) {
       /*Funzione che conta il numero di crediti  */
       API.getPlanExists().then((p) => { if (p > 0) setPlanExists(p) }).catch(err => handleError(err));;
       API.getPlanCfu().then((c) => { setPlanCfu(c) }).catch(err => handleError(err));
-      API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
       //console.log(enrolled);
       API.getPlan().then((plan) => setActualPlan(plan))
         .catch(err => handleError(err));
@@ -87,7 +87,11 @@ function App2() {
   }, [loggedIn]); */
 
   function addPlan(plan, time) {
-    API.addPlan(plan, time).then(() => { setTime(0); setPlanCfu("") })
+    API.addPlan(plan, time).then(() => { setTime(0); setPlanCfu(""); setPlan("") })
+      .catch(err => handleError(err));
+  };
+  function updatePlan(plan) {
+    API.updatePlan(plan).then(() => { setPlanCfu("") })
       .catch(err => handleError(err));
   };
   function deletePlan() {
@@ -138,7 +142,7 @@ function App2() {
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} actualPlan={actualPlan} deletePlan={deletePlan}
           onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} incrementCfu={incrementCfu}
-          setPlan={setPlan} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} enrolled={enrolled}
+          setPlan={setPlan} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} enrolled={enrolled} updatePlan={updatePlan}
         /> : <Navigate to='/login' />} >
         </Route>
       </Routes>

@@ -7,7 +7,7 @@ async function getAllCourses() {
     const response = await fetch(new URL('courses', APIURL));
     const coursesJson = await response.json();
     let courses = coursesJson.map((c) => ({
-        codice: c.codice, nome: c.nome, crediti: c.crediti, iscritti: c.iscritti === null ? 0 : c.iscritti, maxstudenti: c.maxstudenti === null ? 0 : c.maxstudenti,
+        codice: c.codice, nome: c.nome, crediti: c.crediti, iscritti: c.iscritti === null ? 0 : c.iscritti, maxstudenti: c.maxstudenti === null ? "" : c.maxstudenti,
         incompatibilità: !c.incompatibilità ? "" : c.incompatibilità, propedeuticità: !c.propedeuticità ? "" : c.propedeuticità
     })).sort(function (a, b) {
         const nomeA = a.nome.trim().toUpperCase();
@@ -97,6 +97,30 @@ function addPlan(plan, time) {
             }).catch(() => { reject({ error: "Cannot communicate with the server." }) }); // connection errors
     });
 }
+function updatePlan(plan, time) {
+    return new Promise((resolve, reject) => {
+        fetch(new URL('planUpdate', APIURL), {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                plan: plan,
+            }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    resolve(null);
+                } else {
+                    // analyze the cause of error
+                    response.json()
+                        .then((message) => { reject(message); }) // error message in the response body
+                        .catch(() => { reject({ error: "Cannot parse server response." }) }); // something else
+                }
+            }).catch(() => { reject({ error: "Cannot communicate with the server." }) }); // connection errors
+    });
+}
 function deletePlan() {
     return new Promise((resolve, reject) => {
         fetch(new URL('plan', APIURL), {
@@ -147,5 +171,5 @@ async function getUserInfo() {
     }
 }
 
-const API = { getAllCourses, logIn, logOut, getUserInfo, addPlan, getPlan, getPlanExists, deletePlan, getPlanCfu, getEnrolled };
+const API = { getAllCourses, logIn, logOut, getUserInfo, addPlan, getPlan, getPlanExists, deletePlan, getPlanCfu, getEnrolled, updatePlan };
 export default API;

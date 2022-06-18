@@ -26,11 +26,14 @@ function PlanComponents(props) {
                 }
             }
         }
-        if (ok) {
+        if (ok && !props.planExists) {
             props.addPlan(props.plan, props.time);
             props.setOnAdd(false);
             /* Settare esistenza piano */
             //navigate(`/home-logged`);
+        }
+        else if (ok && props.planExists) {
+            props.updatePlan(props.plan);
         }
         else {
             console.log("Errore");
@@ -65,7 +68,6 @@ function PlanComponents(props) {
                 </Row>
             </Container>
             {!props.planExists ? <Row>
-
                 <Col xs={1}>
                     <Link to="/home-logged">
                         <Button onClick={handleSubmit} variant="success">Salva</Button>
@@ -75,21 +77,23 @@ function PlanComponents(props) {
                     <Link to="/home-logged">
                         <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Annulla</Button>
                     </Link>
-                </Col></Row> : <Row><Col xs={1}>
+                </Col></Row>
+                :
+                <Row><Col xs={1}>
                     <Link to="/home-logged">
                         <Button onClick={handleSubmit} variant="success">Salva</Button>
                     </Link>
                 </Col>
-                <Col xs={1}>
-                    <Link to="/home-logged">
-                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="warning">Annulla</Button>
-                    </Link>
-                </Col>
-                <Col xs={1}>
-                    <Link to="/home-logged">
-                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.deletePlan() }} variant="danger">Elimina</Button>
-                    </Link>
-                </Col></Row>
+                    <Col xs={1}>
+                        <Link to="/home-logged">
+                            <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="warning">Annulla</Button>
+                        </Link>
+                    </Col>
+                    <Col xs={1}>
+                        <Link to="/home-logged">
+                            <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.deletePlan() }} variant="danger">Elimina</Button>
+                        </Link>
+                    </Col></Row>
 
             }
         </Col>

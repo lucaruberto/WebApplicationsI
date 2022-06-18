@@ -20,7 +20,7 @@ function PlanPage(props) {
                         <Col md={10}>
                             {props.onAdd || props.planExists ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan} deletePlan={props.deletePlan}
                                 user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu}
-                                time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} planExists={props.planExists} /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} planExists={props.planExists} />}
+                                time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} planExists={props.planExists} updatePlan={props.updatePlan} /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} planExists={props.planExists} />}
                         </Col>
                     </Row>
                     </>
@@ -233,7 +233,7 @@ function CoursesData(props) {
     }
     return (
         <>
-            {props.onAdd ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses}
+            {props.onAdd ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses} enrolled={props.enrolled}
                 setPlanExists={props.setPlanExists} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp}
                 setIsChecked={setIsChecked} disabled={disabled} setDisabled={setDisabled} dis={dis} setStatusClass={props.setStatusClass} setMessage={props.setMessage}
             /></td> : ""}
@@ -275,34 +275,39 @@ function SelectCheck(props) {
                             props.setStatusClass('table-danger');
                             props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
                         }
-                    }
-                    else {
-                        props.dis();
-                        props.addCoursePlan(props.courses);
-                        props.setStatusClass('table-success');
+                        if (props.courses.maxstudenti && (props.enrolled > props.courses.maxstudenti)) {
+                            props.dis();
+                            props.setStatusClass('table-danger');
+                            props.setMessage("Numero massimo iscritti superato");
+                        }
+                        else {
+                            props.dis();
+                            props.addCoursePlan(props.courses);
+                            props.setStatusClass('table-success');
+                        }
                     }
                 }
+                else if (props.courses.propedeuticità) {
+                    props.setStatusClass('table-danger');
+                    props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
+                }
+                else {
+                    props.dis();
+                    props.addCoursePlan(props.courses);
+                    props.setStatusClass('table-success');
+                }
             }
-            else if (props.courses.propedeuticità) {
-                props.setStatusClass('table-danger');
-                props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
-            }
-            else {
-                props.dis();
-                props.addCoursePlan(props.courses);
-                props.setStatusClass('table-success');
-            }
+            props.setIsChecked(!props.isChecked);
         }
-        props.setIsChecked(!props.isChecked);
-    }
-    return (<>
-        <Form.Check variant="warning"
-            type="checkbox"
-            disabled={props.disabled}
-            checked={props.isChecked}
-            //label={`default ${type}`}
-            onChange={handleOnCheck} />
-    </>
-    );
-};
+        return (<>
+            <Form.Check variant="warning"
+                type="checkbox"
+                disabled={props.disabled}
+                checked={props.isChecked}
+                //label={`default ${type}`}
+                onChange={handleOnCheck} />
+        </>
+        );
+    };
+}
 export { CoursesList, PlanPage };
