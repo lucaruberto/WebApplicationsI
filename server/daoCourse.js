@@ -2,7 +2,7 @@
 const sqlite = require('sqlite3');
 
 // Open the database
-const db = new sqlite.Database('course.db', (err) => {
+const db = new sqlite.Database('course.sqlite', (err) => {
     if (err) throw err;
 });
 
@@ -85,7 +85,7 @@ exports.getEnrolled = (course) => {
 };
 exports.getPlan = (userId) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT Codice, Nome, Crediti FROM Course JOIN Plan WHERE Plan.course = Course.Codice AND userid = ?';
+        const sql = 'SELECT Codice, Nome, Crediti, Incompatibilità, Propedeuticità FROM Course JOIN Plan WHERE Plan.course = Course.Codice AND userid = ?';
         db.all(sql, [userId], (err, rows) => {
             if (err) {
                 reject(err);
@@ -98,7 +98,10 @@ exports.getPlan = (userId) => {
                     {
                         codice: c.Codice,
                         nome: c.Nome,
-                        crediti: c.Crediti
+                        crediti: c.Crediti,
+                        maxstudenti: c.MaxStudenti,
+                        incompatibilità: c.Incompatibilità,
+                        propedeuticità: c.Propedeuticità
                     }
                 ))
                 resolve(plan);
@@ -121,7 +124,7 @@ exports.createPlan = (course, userId) => {
     });
 };
 
-/* exports.deletePlanCourse = (course, userId) => {
+exports.deleteCourse = (course, userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM Plan WHERE course = ? AND userid = ?';
         db.run(sql, [course, userId], (err) => {
@@ -129,10 +132,10 @@ exports.createPlan = (course, userId) => {
                 reject(err);
                 return;
             } else
-                resolve(null);
+                resolve(course);
         });
     });
-} */
+}
 
 exports.deletePlan = (userId) => {
     return new Promise((resolve, reject) => {

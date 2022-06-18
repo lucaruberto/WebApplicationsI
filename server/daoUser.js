@@ -5,13 +5,13 @@ const sqlite = require('sqlite3');
 const crypto = require('crypto');
 
 // open the database
-const db = new sqlite.Database('course.db', (err) => {
+const db = new sqlite.Database('course.sqlite', (err) => {
     if (err) throw err;
 });
 
 exports.getUserById = (id) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM user WHERE id = ?';
+        const sql = 'SELECT * FROM User WHERE id = ?';
         db.get(sql, [id], (err, row) => {
             if (err)
                 reject(err);
@@ -28,7 +28,7 @@ exports.getUserById = (id) => {
 
 exports.getUser = (email, password) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM user WHERE email = ?';
+        const sql = 'SELECT * FROM User WHERE email = ?';
         db.get(sql, [email], (err, row) => {
             if (err) { reject(err); }
             else if (row === undefined) { resolve(false); }

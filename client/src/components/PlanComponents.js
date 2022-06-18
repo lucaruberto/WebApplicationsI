@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Container, Table, Row, Col, Stack } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
+import API from '../API';
 function PlanComponents(props) {
     const handleSubmit = (event) => {
         let ok = false;
@@ -36,10 +36,19 @@ function PlanComponents(props) {
             props.updatePlan(props.plan);
         }
         else {
-            console.log("Errore");
+            props.setMessage("Non è possibile inserire o aggiornare il piano in quanto non rispetta i parametri")
         }
     }
+    const handleDelete = (codice) => {
+        let cod;
+        if (props.plan.some((c) => c.propedeuticità === codice)) {
+            props.setMessage("Non è possibile eliminare il corso in quanto propedeutico");
+        }
+        else
+            props.deleteFromPlan(props.plan);
 
+
+    }
 
 
     return (<>
@@ -59,10 +68,9 @@ function PlanComponents(props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {props.planExists ? props.actualPlan.map((plan, i) =>
-                                <PlanRow plan={plan} key={i} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />) :
+                            {
                                 props.plan.map((plan, i) =>
-                                    <PlanRow plan={plan} key={i} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />)}
+                                    <PlanRow plan={plan} key={i} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} courses={props.courses} handleDelete={handleDelete} />)}
                         </tbody>
                     </Table>
                 </Row>
@@ -81,17 +89,17 @@ function PlanComponents(props) {
                 :
                 <Row><Col xs={1}>
                     <Link to="/home-logged">
-                        <Button onClick={handleSubmit} variant="success">Salva</Button>
+                        <Button onClick={() => props.updatePlan(props.plan)} variant="success">Salva</Button>
                     </Link>
                 </Col>
                     <Col xs={1}>
                         <Link to="/home-logged">
-                            <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="warning">Annulla</Button>
+                            <Button onClick={() => props.setActualPlan(props.backupPlan)} variant="warning">Annulla</Button>
                         </Link>
                     </Col>
                     <Col xs={1}>
                         <Link to="/home-logged">
-                            <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.deletePlan() }} variant="danger">Elimina</Button>
+                            <Button onClick={() => { props.setActualPlan([]); props.setOnAdd(false); props.deletePlan(); }} variant="danger">Elimina</Button>
                         </Link>
                     </Col></Row>
 
@@ -105,18 +113,16 @@ function PlanRow(props) {
     return (
         <>
             <tr>
-                <PlanData plan={props.plan} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} />
+                <PlanData plan={props.plan} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} courses={props.courses} handleDelete={props.handleDelete} />
             </tr>
         </>
     );
 };
 function PlanData(props) {
-    /* Implementare la funzione per la delete di un corso se non ci sono vincoli di propedeuticità da rispettare */
-    /* onClick={() => { props.deleteFilm(props.id) }} */
     return (
         <>
             <td>
-                <i className="bi bi-x-circle-fill" style={{ color: "red" }} onClick={() => { props.deleteFromPlan(props.plan) }}></i>
+                <i className="bi bi-x-circle-fill" style={{ color: "red" }} onClick={() => { props.handleDelete(props.plan.codice) }}></i>
             </td>
             <td> {props.plan.codice} </td>
             <td> {props.plan.nome} </td>

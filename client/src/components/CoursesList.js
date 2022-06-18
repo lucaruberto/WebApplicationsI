@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Container, Table, Row, Col, Button, Navbar, Form, Nav, Accordion } from "react-bootstrap";
+import { Container, Table, Row, Col, Button, Navbar, Form, Nav, Accordion, Alert } from "react-bootstrap";
 import React from "react";
 import { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation, Outlet } from 'react-router-dom';
@@ -8,18 +8,21 @@ import { LogoutButton } from './LoginComponents';
 import { PlanComponents } from './PlanComponents';
 
 function PlanPage(props) {
-    console.log()
     return (
         <>
             <Container fluid  >
-                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user} enrolled={props.enrolled}
+                <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user} enrolled={props.enrolled} planExists={props.planExists}
                     addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
                 {
                     <> <Row className='below-nav'>
-                        <Col md={2}> <h1>{props.planExists ? "Aggiorna il piano di studi" : "Crea un nuovo piano di studi"}</h1> </Col>
+                        <Col md={2}> <h1>{props.planExists ? "Aggiorna il piano di studi" : "Crea un nuovo piano di studi"}</h1>
+                            <Row><Col>
+                                {props.message ? <Alert variant='danger' onClose={() => props.setMessage('')} dismissible>{props.message}</Alert> : false}
+                            </Col></Row>
+                        </Col>
                         <Col md={10}>
-                            {props.onAdd || props.planExists ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan} deletePlan={props.deletePlan}
-                                user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu}
+                            {(props.onAdd || props.planExists) ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan} deletePlan={props.deletePlan} setMessage={props.setMessage}
+                                user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu} backupPlan={props.backupPlan}
                                 time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} planExists={props.planExists} updatePlan={props.updatePlan} /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} planExists={props.planExists} />}
                         </Col>
                     </Row>
@@ -85,9 +88,6 @@ function CreatePlan(props) {
         </>
     );
 };
-function StudyPlan(props) {
-    return (false);
-};
 
 function CoursesList(props) {
     const navigate = useNavigate();
@@ -118,7 +118,7 @@ function CoursesList(props) {
                     </Col>
                     <Col md={10}  >
                         <CoursesListTable courses={props.courses} addCoursePlan={props.addCoursePlan} plan={props.plan} enrolled={props.enrolled}
-                            setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} planExists={props.planExists} />
+                            setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} planExists={props.planExists} loggedIn={props.loggedIn} />
                     </Col>
                 </Row>
                 {/*<Row >
@@ -132,8 +132,6 @@ function CoursesList(props) {
 
 }
 function CoursesListTable(props) {
-    //console.log(props.enrolled[0]);
-    //console.log(props.enrolled[0].cnt);
     return (
         <Container fluid>
             <Row>
@@ -145,7 +143,8 @@ function CoursesListTable(props) {
                     </thead>
                     <tbody>
                         {props.courses.map((courses, i) =>
-                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} enrolled={props.enrolled[i]} />)}
+                            <CoursesRow courses={courses} key={i} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists}
+                                planExists={props.planExists} time={props.time} onAdd={props.onAdd} enrolled={props.enrolled[i]} loggedIn={props.loggedIn} />)}
                     </tbody>
                 </Table>
             </Row>
@@ -160,7 +159,7 @@ function CoursesRow(props) {
     return (
         <>
             <tr className={statusClass}>
-                <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time} enrolled={props.enrolled}
+                <CoursesData courses={props.courses} addCoursePlan={props.addCoursePlan} time={props.time} enrolled={props.enrolled} planExists={props.planExists} loggedIn={props.loggedIn}
                     plan={props.plan} setPlanExists={props.setPlanExists} setStatusClass={setStatusClass} message={message} setMessage={setMessage} statusClass={statusClass} onAdd={props.onAdd} />
             </tr>
         </>
@@ -199,7 +198,7 @@ function CoursesData(props) {
         else if (props.statusClass === "table-danger") {
 
         }
-    }, [props.plan.length, props]);
+    }, [props.plan.length, props.loggedIn]);
 
     const checkProp = (cod) => {
         if (props.courses.propedeuticità === cod) {
@@ -233,8 +232,8 @@ function CoursesData(props) {
     }
     return (
         <>
-            {props.onAdd ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses} enrolled={props.enrolled}
-                setPlanExists={props.setPlanExists} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp}
+            {(props.onAdd || props.planExists > 0) ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses} enrolled={props.enrolled}
+                setPlanExists={props.setPlanExists} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp} planExists={props.planExists}
                 setIsChecked={setIsChecked} disabled={disabled} setDisabled={setDisabled} dis={dis} setStatusClass={props.setStatusClass} setMessage={props.setMessage}
             /></td> : ""}
             <td> {props.courses.codice} </td>
@@ -264,10 +263,15 @@ function SelectCheck(props) {
         if (!props.isChecked) {
             if (props.plan.length > 0) {
                 if (props.plan.every((c) => props.check(c.incompatibilità, c.codice))) {
-                    if (props.courses.propedeuticità) {
+                    if (props.courses.maxstudenti && (props.enrolled > props.courses.maxstudenti)) {
+                        props.dis();
+                        props.setStatusClass('table-danger');
+                        props.setMessage("Numero massimo iscritti superato");
+                    }
+                    else if (props.courses.propedeuticità) {
                         if (props.plan.some((c) => props.checkProp(c.codice))) {
                             props.dis();
-                            props.addCoursePlan(props.courses);
+                            props.addCoursePlan(props.courses, props.planExists);
                             props.setStatusClass('table-success');
                         }
                         else {
@@ -275,39 +279,35 @@ function SelectCheck(props) {
                             props.setStatusClass('table-danger');
                             props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
                         }
-                        if (props.courses.maxstudenti && (props.enrolled > props.courses.maxstudenti)) {
-                            props.dis();
-                            props.setStatusClass('table-danger');
-                            props.setMessage("Numero massimo iscritti superato");
-                        }
-                        else {
-                            props.dis();
-                            props.addCoursePlan(props.courses);
-                            props.setStatusClass('table-success');
-                        }
+                    }
+                    else {
+                        props.dis();
+                        props.addCoursePlan(props.courses, props.planExists);
+                        props.setStatusClass('table-success');
                     }
                 }
-                else if (props.courses.propedeuticità) {
-                    props.setStatusClass('table-danger');
-                    props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
-                }
-                else {
-                    props.dis();
-                    props.addCoursePlan(props.courses);
-                    props.setStatusClass('table-success');
-                }
             }
-            props.setIsChecked(!props.isChecked);
+            else if (props.courses.propedeuticità) {
+                props.setStatusClass('table-danger');
+                props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
+            }
+            else {
+                props.dis();
+                props.addCoursePlan(props.courses, props.planExists);
+                props.setStatusClass('table-success');
+            }
         }
-        return (<>
-            <Form.Check variant="warning"
-                type="checkbox"
-                disabled={props.disabled}
-                checked={props.isChecked}
-                //label={`default ${type}`}
-                onChange={handleOnCheck} />
-        </>
-        );
-    };
-}
+        props.setIsChecked(!props.isChecked);
+    }
+    return (<>
+        <Form.Check variant="warning"
+            type="checkbox"
+            disabled={props.disabled}
+            checked={props.isChecked}
+            //label={`default ${type}`}
+            onChange={handleOnCheck} />
+    </>
+    );
+};
+
 export { CoursesList, PlanPage };

@@ -7,7 +7,7 @@ async function getAllCourses() {
     const response = await fetch(new URL('courses', APIURL));
     const coursesJson = await response.json();
     let courses = coursesJson.map((c) => ({
-        codice: c.codice, nome: c.nome, crediti: c.crediti, iscritti: c.iscritti === null ? 0 : c.iscritti, maxstudenti: c.maxstudenti === null ? "" : c.maxstudenti,
+        codice: c.codice, nome: c.nome, crediti: c.crediti, maxstudenti: c.maxstudenti === null ? "" : c.maxstudenti,
         incompatibilità: !c.incompatibilità ? "" : c.incompatibilità, propedeuticità: !c.propedeuticità ? "" : c.propedeuticità
     })).sort(function (a, b) {
         const nomeA = a.nome.trim().toUpperCase();
@@ -32,7 +32,10 @@ async function getPlan() {
     const response = await fetch(new URL('plan', APIURL), { credentials: 'include' });
     const planJson = await response.json();
     if (response.ok) {
-        return planJson.map((c) => ({ codice: c.codice, nome: c.nome, crediti: c.crediti }))
+        return planJson.map((c) => ({
+            codice: c.codice, nome: c.nome, crediti: c.crediti, maxstudenti: c.maxstudenti === null ? "" : c.maxstudenti,
+            incompatibilità: !c.incompatibilità ? "" : c.incompatibilità, propedeuticità: !c.propedeuticità ? "" : c.propedeuticità
+        }))
     } else {
         throw planJson;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
     }
@@ -97,7 +100,7 @@ function addPlan(plan, time) {
             }).catch(() => { reject({ error: "Cannot communicate with the server." }) }); // connection errors
     });
 }
-function updatePlan(plan, time) {
+function updatePlan(plan) {
     return new Promise((resolve, reject) => {
         fetch(new URL('planUpdate', APIURL), {
             method: 'POST',

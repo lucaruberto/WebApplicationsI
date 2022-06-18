@@ -75,14 +75,16 @@ app.use(passport.session());
 
 /*** APIs ***/
 
-// GET /api/courses
+/* GET */
+
+/* GET /api/courses */
 app.get('/api/courses', (req, res) => {
   dao.listCourses()
     .then(courses => res.json(courses))
     .catch(() => res.status(500).end());
 });
 
-// GET /api/plan
+/* GET /api/plan */
 app.get('/api/plan', isLoggedIn, async (req, res) => {
   try {
     const result = await dao.getPlan(req.user.id);
@@ -107,7 +109,8 @@ app.get('/api/planExists', isLoggedIn, async (req, res) => {
     res.status(500).end();
   }
 });
-// GET /api/planCfu
+
+/* GET /api/planCfu */
 app.get('/api/planCfu', isLoggedIn, async (req, res) => {
   try {
     const result = await dao.getPlanCfu(req.user.id);
@@ -119,7 +122,8 @@ app.get('/api/planCfu', isLoggedIn, async (req, res) => {
     res.status(500).end();
   }
 });
-// GET /api/enrolled
+
+/* GET /api/enrolled */
 app.get('/api/enrolled', isLoggedIn, async (req, res) => {
   try {
     let cnt = [];
@@ -137,7 +141,6 @@ app.get('/api/enrolled', isLoggedIn, async (req, res) => {
     });;;
     for (let c of courses) {
       cnt.push(await dao.getEnrolled(c.codice));
-      //console.log(cnt);
     }
     if (cnt.error)
       res.status(404).json(cnt);
@@ -147,7 +150,10 @@ app.get('/api/enrolled', isLoggedIn, async (req, res) => {
     res.status(500).end();
   }
 });
-// POST /api/plan
+
+/* POST */
+
+/* POST /api/plan */
 app.post('/api/plan', isLoggedIn, [check('plan').isArray()
 ], async (req, res) => {
   const errors = validationResult(req);
@@ -166,8 +172,44 @@ app.post('/api/plan', isLoggedIn, [check('plan').isArray()
   }
 });
 
-// DELETE /api/plan/:course
-app.delete('/api/plan/:course', isLoggedIn, async (req, res) => {
+/* POST /api/planUpdate */
+app.post('/api/planUpdate', isLoggedIn, [check('plan').isArray()
+], async (req, res) => {
+  let padd = [];
+  let pdel = [];
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  try {
+    const p = await dao.getPlan(req.user.id);
+    console.log(p);
+    for (let c of req.body.plan) {
+      if (!p.some((d) => c.codice === d.codice)) {
+        padd.push(c.codice);
+      }
+    }
+    for (let c of p) {
+      if (!req.body.plan.some((d) => c.codice === d.codice)) {
+        pdel.push(c.codice);
+      }
+    }
+    for (let c of padd) {
+      await dao.createPlan(c, req.user.id);
+    }
+    for (let c of pdel) {
+      await dao.deleteCourse(c, req.user.id);
+    }
+    res.status(201).end();
+  } catch (err) {
+    console.log(err);
+    // res.status(503).json({error: `Database error during the creation of exam ${plan.code}.`});
+  }
+});
+/* DELETE */
+
+/* DELETE /api/plan/:course */
+/* app.delete('/api/planCourse', isLoggedIn, async (req, res) => {
   try {
     await dao.deletePlanCourse(req.params.code, req.user.id);
     res.status(204).end();
@@ -175,9 +217,9 @@ app.delete('/api/plan/:course', isLoggedIn, async (req, res) => {
     console.log(err);
     res.status(503).json({ error: `Database error during the deletion of course from a Plan ${req.params.code}.` });
   }
-});
+});  */
 
-// DELETE /api/plan/
+/* DELETE /api/plan/ */
 app.delete('/api/plan', isLoggedIn, async (req, res) => {
   try {
     await dao.deletePlan(req.user.id);
