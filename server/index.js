@@ -72,7 +72,7 @@ app.use(passport.session());
 /* GET */
 
 /* GET /api/courses */
-app.get('/api/courses', (req, res) => {
+app.get('/api/courses', (res) => {
   dao.listCourses()
     .then(courses => res.json(courses))
     .catch(() => res.status(500).end());
