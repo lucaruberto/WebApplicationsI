@@ -290,7 +290,7 @@ function SelectCheck(props) {
                 props.setMessage("Inserire l'esame propedeutico: " + props.courses.propedeuticità);
             }
             else {
-                props.dis();
+                //props.dis();
                 props.addCoursePlan(props.courses, props.planExists);
                 props.setStatusClass('table-success');
             }

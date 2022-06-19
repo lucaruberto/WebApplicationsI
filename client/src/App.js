@@ -26,7 +26,6 @@ function App2() {
   const [enrolled, setEnrolled] = useState([]);
   const [actualPlan, setActualPlan] = useState([]);
   const [backupPlan, setBackupPlan] = useState([]);
-  const [prova, setprova] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,7 +53,7 @@ function App2() {
   function addCoursePlan(course, planExists) {
     if (planExists) {
       incrementCfu(course.crediti);
-      setActualPlan(Plan => [...Plan, course]);
+      setActualPlan(oldPlan => [...oldPlan, course]);
     }
     else {
       console.log("Here2");
@@ -85,14 +84,17 @@ function App2() {
 
   }
   useEffect(() => {
+    if (loggedIn) {
+      API.getPlanExists().then((p) => { if (p > 0) { setPlanExists(p) } else { setPlanExists(0) } }).catch(err => handleError(err));
+      API.getPlanCfu().then((c) => { setPlanCfu(c); console.log("get") }).catch(err => handleError(err));
+      API.getPlan().then((plan) => { setActualPlan(plan); setBackupPlan(plan); console.log("plan") })
+        .catch(err => handleError(err));
+    }
+  }, [loggedIn, onAdd]);
 
+  useEffect(() => {
     if (loggedIn) {
       /*Funzione che conta il numero di crediti  */
-      API.getPlanExists().then((p) => { if (p > 0) { setPlanExists(p) } else { setPlanExists(0) } }).catch(err => handleError(err));;
-      if (planExists) {
-        API.getPlanCfu().then((c) => { setPlanCfu(c) }).catch(err => handleError(err)); API.getPlan().then((plan) => { setActualPlan(plan); setBackupPlan(plan) })
-          .catch(err => handleError(err));
-      }
       API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
 
     }
