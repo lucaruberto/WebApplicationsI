@@ -20,7 +20,7 @@ function PlanPage(props) {
                             </Col></Row>
                         </Col>
                         <Col md={10}>
-                            {(props.onAdd || props.planExists) ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan} deletePlan={props.deletePlan} setMessage={props.setMessage}
+                            {(props.onAdd || props.planExists > 0) ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan} deletePlan={props.deletePlan} setMessage={props.setMessage} setPlanCfu={props.setPlanCfu}
                                 user={props.user} addCoursePlan={props.addCoursePlan} plan={props.planExists ? props.actualPlan : props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu} backupPlan={props.backupPlan} setActualPlan={props.setActualPlan}
                                 time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} planExists={props.planExists} updatePlan={props.updatePlan} /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} planExists={props.planExists} />}
                         </Col>
@@ -168,7 +168,6 @@ function CoursesData(props) {
     const [isChecked, setIsChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
     useEffect(() => {
-        //.log(props.statusClass);
         if (disabled && props.statusClass !== "table-success") {
             /* Si toglie il disabilitato dopo la useEffect e quando ci sono incompatibilità */
             /* Controllare le incompatibilità in seguito alla delete */
@@ -231,7 +230,7 @@ function CoursesData(props) {
     }
     return (
         <>
-            {(props.onAdd || props.planExists > 0) ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses} enrolled={props.enrolled}
+            {(props.onAdd || (props.planExists > 0)) ? <td><SelectCheck plan={props.plan} addCoursePlan={props.addCoursePlan} courses={props.courses} enrolled={props.enrolled}
                 setPlanExists={props.setPlanExists} time={props.time} check={check} isChecked={isChecked} checkProp={checkProp} planExists={props.planExists}
                 setIsChecked={setIsChecked} disabled={disabled} setDisabled={setDisabled} dis={dis} setStatusClass={props.setStatusClass} setMessage={props.setMessage}
             /></td> : ""}

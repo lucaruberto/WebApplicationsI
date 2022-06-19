@@ -38,14 +38,9 @@ function PlanComponents(props) {
             props.setMessage("Non è possibile inserire o aggiornare il piano in quanto non rispetta i parametri")
         }
     }
-    const handleDelete = (codice) => {
-        if (props.plan.some((c) => c.propedeuticità === codice)) {
-            props.setMessage("Non è possibile eliminare il corso in quanto propedeutico");
-        }
-        else
-            props.deleteFromPlan(props.plan);
 
-
+    const handleDelete = (course) => {
+        props.deleteFromPlan(course);
     }
 
 
@@ -81,7 +76,7 @@ function PlanComponents(props) {
                 </Col>
                 <Col xs={1}>
                     <Link to="/home-logged">
-                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false) }} variant="danger">Annulla</Button>
+                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.setPlanCfu(0) }} variant="danger">Annulla</Button>
                     </Link>
                 </Col></Row>
                 :
@@ -97,7 +92,7 @@ function PlanComponents(props) {
                     </Col>
                     <Col xs={1}>
                         <Link to="/home-logged">
-                            <Button onClick={() => { props.setActualPlan([]); props.setOnAdd(false); props.deletePlan(); }} variant="danger">Elimina</Button>
+                            <Button onClick={() => { props.deletePlan(); }} variant="danger">Elimina</Button>
                         </Link>
                     </Col></Row>
 
@@ -120,7 +115,7 @@ function PlanData(props) {
     return (
         <>
             <td>
-                <i className="bi bi-x-circle-fill" style={{ color: "red" }} onClick={() => { props.handleDelete(props.plan.codice) }}></i>
+                <i className="bi bi-x-circle-fill" style={{ color: "red" }} onClick={() => { props.handleDelete(props.plan) }}></i>
             </td>
             <td> {props.plan.codice} </td>
             <td> {props.plan.nome} </td>

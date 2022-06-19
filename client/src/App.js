@@ -26,6 +26,7 @@ function App2() {
   const [enrolled, setEnrolled] = useState([]);
   const [actualPlan, setActualPlan] = useState([]);
   const [backupPlan, setBackupPlan] = useState([]);
+  const [prova, setprova] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,16 +54,16 @@ function App2() {
   function addCoursePlan(course, planExists) {
     if (planExists) {
       incrementCfu(course.crediti);
-      setActualPlan(oldPlan => [...oldPlan, course]);
+      setActualPlan(Plan => [...Plan, course]);
     }
     else {
+      console.log("Here2");
       incrementCfu(course.crediti);
       setPlan(oldPlan => [...oldPlan, course]);
     }
   }
   /* Dovrei controllare se ci sono propedeuticità */
   function deleteFromPlan(course) {
-
     if (!planExists) {
       if (plan.some((c) => c.propedeuticità === course.codice)) {
         setMessage("Non è possibile cancellare l'esame per propedeuticità");
@@ -88,10 +89,12 @@ function App2() {
     if (loggedIn) {
       /*Funzione che conta il numero di crediti  */
       API.getPlanExists().then((p) => { if (p > 0) { setPlanExists(p) } else { setPlanExists(0) } }).catch(err => handleError(err));;
-      API.getPlanCfu().then((c) => { setPlanCfu(c) }).catch(err => handleError(err));
+      if (planExists) {
+        API.getPlanCfu().then((c) => { setPlanCfu(c) }).catch(err => handleError(err)); API.getPlan().then((plan) => { setActualPlan(plan); setBackupPlan(plan) })
+          .catch(err => handleError(err));
+      }
       API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
-      API.getPlan().then((plan) => { setActualPlan(plan); setBackupPlan(plan) })
-        .catch(err => handleError(err));
+
     }
 
   }, [loggedIn, onAdd, time, planCfu]);
@@ -104,7 +107,7 @@ function App2() {
   }, [loggedIn]); */
 
   function addPlan(plan, time) {
-    API.addPlan(plan, time).then(() => { setTime(0); setPlanCfu(""); setPlan(""); setPlanExists(time); setOnAdd(false); })
+    API.addPlan(plan, time).then(() => { setTime(0); setPlan([]); setPlanExists(time); setOnAdd(false); })
       .catch(err => handleError(err));
   };
   function updatePlan(plan) {
@@ -112,7 +115,7 @@ function App2() {
       .catch(err => handleError(err));
   };
   function deletePlan(time) {
-    API.deletePlan().then(() => setPlanExists(0))
+    API.deletePlan().then(() => { setPlanExists(-1); setPlanCfu(0); setOnAdd(false); setActualPlan([]); setPlan([]) })
       .catch(err => handleError(err));
   };
   function incrementCfu(cfu) {
@@ -157,7 +160,7 @@ function App2() {
         <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} message={message} setMessage={setMessage}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} deletePlan={deletePlan} backupPlan={backupPlan} setActualPlan={setActualPlan}
-          onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} actualPlan={actualPlan} incrementCfu={incrementCfu}
+          onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} actualPlan={actualPlan} incrementCfu={incrementCfu} setPlanCfu={setPlanCfu}
           setPlan={setPlan} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} enrolled={enrolled} updatePlan={updatePlan}
         /> : <Navigate to='/login' />} >
         </Route>
