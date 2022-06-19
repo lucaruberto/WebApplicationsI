@@ -94,7 +94,7 @@ function App2() {
         .catch(err => handleError(err));
     }
 
-  }, [loggedIn, onAdd, time]);
+  }, [loggedIn, onAdd, time, planCfu]);
 
   /* useEffect(() => {
     if (!loggedIn) {

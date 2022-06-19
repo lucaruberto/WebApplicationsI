@@ -185,7 +185,7 @@ check('plan.*.incompatibilità').optional({ checkFalsy: true }).custom((i, { req
 check('plan.*').optional({ checkFalsy: true }).custom(async (c, { req }) => {
   const iscritti = await dao.getEnrolled(c.codice);
 
-  if (c.maxstudenti > 0 && iscritti[0].cnt >= c.maxstudenti)
+  if (c.maxstudenti > 0 && iscritti[0].cnt > c.maxstudenti)
     throw new Error("Numero iscritti superato");
   return true;
 }),
@@ -252,7 +252,7 @@ app.post('/api/planUpdate', isLoggedIn, [
   check('plan.*').optional({ checkFalsy: true }).custom(async (c, { req }) => {
     const iscritti = await dao.getEnrolled(c.codice);
 
-    if (c.maxstudenti > 0 && iscritti[0].cnt >= c.maxstudenti)
+    if (c.maxstudenti > 0 && iscritti[0].cnt > c.maxstudenti)
       throw new Error("Numero iscritti superato");
     return true;
   }),
