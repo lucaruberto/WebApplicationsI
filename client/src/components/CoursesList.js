@@ -8,6 +8,8 @@ import { LogoutButton } from './LoginComponents';
 import { PlanComponents } from './PlanComponents';
 
 function PlanPage(props) {
+    //console.log(props.planExists);
+    console.log(props.onAdd);
     return (
         <>
             <Container fluid  >
@@ -166,7 +168,6 @@ function CoursesRow(props) {
     );
 }
 function CoursesData(props) {
-    console.log(props.plan);
     const [isChecked, setIsChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
     useEffect(() => {
