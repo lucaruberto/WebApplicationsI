@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import API from '../API';
 function PlanComponents(props) {
     const handleSubmit = (event) => {
+        console.log(props.plan);
         let ok = false;
         event.preventDefault();
         //ADD
@@ -28,7 +29,7 @@ function PlanComponents(props) {
         }
         if (ok && !props.planExists) {
             props.addPlan(props.plan, props.time);
-            props.setOnAdd(false);
+
             /* Settare esistenza piano */
             //navigate(`/home-logged`);
         }

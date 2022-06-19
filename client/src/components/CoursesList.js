@@ -12,7 +12,7 @@ function PlanPage(props) {
         <>
             <Container fluid  >
                 <CoursesList courses={props.courses} loggedIn={props.loggedIn} logout={props.logout} user={props.user} enrolled={props.enrolled} planExists={props.planExists}
-                    addCoursePlan={props.addCoursePlan} plan={props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
+                    addCoursePlan={props.addCoursePlan} plan={props.planExists ? props.actualPlan : props.plan} setPlanExists={props.setPlanExists} time={props.time} onAdd={props.onAdd} />
                 {
                     <> <Row className='below-nav'>
                         <Col md={2}> <h1>{props.planExists ? "Aggiorna il piano di studi" : "Crea un nuovo piano di studi"}</h1>
@@ -22,7 +22,7 @@ function PlanPage(props) {
                         </Col>
                         <Col md={10}>
                             {(props.onAdd || props.planExists) ? <PlanComponents setOnAdd={props.setOnAdd} courses={props.courses} loggedIn={props.loggedIn} logout={props.doLogOut} actualPlan={props.actualPlan} deletePlan={props.deletePlan} setMessage={props.setMessage}
-                                user={props.user} addCoursePlan={props.addCoursePlan} plan={props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu} backupPlan={props.backupPlan}
+                                user={props.user} addCoursePlan={props.addCoursePlan} plan={props.planExists ? props.actualPlan : props.plan} setPlan={props.setPlan} setPlanExists={props.setPlanExists} incrementCfu={props.incrementCfu} planCfu={props.planCfu} backupPlan={props.backupPlan} setActualPlan={props.setActualPlan}
                                 time={props.time} deleteFromPlan={props.deleteFromPlan} decrementCfu={props.decrementCfu} addPlan={props.addPlan} planExists={props.planExists} updatePlan={props.updatePlan} /> : <CreatePlan setOnAdd={props.setOnAdd} setTime={props.setTime} planExists={props.planExists} />}
                         </Col>
                     </Row>
@@ -166,6 +166,7 @@ function CoursesRow(props) {
     );
 }
 function CoursesData(props) {
+    console.log(props.plan);
     const [isChecked, setIsChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
     useEffect(() => {

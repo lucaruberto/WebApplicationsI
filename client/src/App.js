@@ -109,7 +109,7 @@ function App2() {
   }, [loggedIn]); */
 
   function addPlan(plan, time) {
-    API.addPlan(plan, time).then(() => { setTime(0); setPlanCfu(""); setPlan(""); setPlanExists(0) })
+    API.addPlan(plan, time).then(() => { setTime(0); setPlanCfu(""); setPlan(""); setPlanExists(time); setOnAdd(false); })
       .catch(err => handleError(err));
   };
   function updatePlan(plan) {
@@ -130,7 +130,7 @@ function App2() {
     /* setCourses(list.nome.sort((Architetture, Database) => Architetture - Database))  */
     API.getAllCourses().then((list) => { setCourses(list) })
       .catch(err => handleError(err))
-  }, [loggedIn])
+  }, [loggedIn, planExists])
 
   function handleError(err) {
     console.log(err);
@@ -161,8 +161,8 @@ function App2() {
         <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} plan={plan} enrolled={enrolled} />} />
         <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} />} />
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} message={message} setMessage={setMessage}
-          planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} deletePlan={deletePlan} backupPlan={backupPlan}
-          onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={planExists ? actualPlan : plan} incrementCfu={incrementCfu}
+          planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} deletePlan={deletePlan} backupPlan={backupPlan} setActualPlan={setActualPlan}
+          onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} actualPlan={actualPlan} incrementCfu={incrementCfu}
           setPlan={setPlan} deleteFromPlan={deleteFromPlan} decrementCfu={decrementCfu} addPlan={addPlan} enrolled={enrolled} updatePlan={updatePlan}
         /> : <Navigate to='/login' />} >
         </Route>

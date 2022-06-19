@@ -154,7 +154,8 @@ app.get('/api/enrolled', isLoggedIn, async (req, res) => {
 /* POST */
 
 /* POST /api/plan */
-app.post('/api/plan', isLoggedIn, [check('plan').isArray()
+app.post('/api/plan', isLoggedIn, [check('plan').isArray(),
+check('*plan.codice').isLength({ min: 7, max: 7 })
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
