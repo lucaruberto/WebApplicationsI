@@ -9,7 +9,6 @@ const LocalStrategy = require('passport-local').Strategy; // username and passwo
 const session = require('express-session'); // enable sessions
 const userDao = require('./daoUser'); // module for accessing the users in the DB
 const cors = require('cors');
-
 /*** Set up Passport ***/
 
 passport.use(new LocalStrategy(

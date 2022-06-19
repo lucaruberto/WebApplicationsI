@@ -1,7 +1,7 @@
 import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
 function LoginForm(props) {
-  const [username, setUsername] = useState('student@studenti.polito.it');
+  const [username, setUsername] = useState('luca@studenti.polito.it');
   const [password, setPassword] = useState('password');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -50,7 +50,7 @@ function LoginForm(props) {
 function LogoutButton(props) {
   return (
     <Col>
-      <span>Benvenuto: {props.user?.name}</span>{'    '}
+      <span>Benvenut*: {props.user?.name}</span>{'    '}
       <Button variant="danger" onClick={props.logout}>Logout</Button>
     </Col>
   )

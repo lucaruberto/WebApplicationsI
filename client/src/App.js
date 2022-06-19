@@ -17,7 +17,7 @@ function App2() {
   const [courses, setCourses] = useState([]); //Lista di corsi versione Client-Server
   const [loggedIn, setLoggedIn] = useState(false);  // no user is logged in when app loads
   const [user, setUser] = useState({});
-  const [planExists, setPlanExists] = useState('');
+  const [planExists, setPlanExists] = useState(0);
   const [planCfu, setPlanCfu] = useState(0);
   const [message, setMessage] = useState('');
   const [onAdd, setOnAdd] = useState(false);
@@ -87,7 +87,7 @@ function App2() {
 
     if (loggedIn) {
       /*Funzione che conta il numero di crediti  */
-      API.getPlanExists().then((p) => { if (p > 0) setPlanExists(p) }).catch(err => handleError(err));;
+      API.getPlanExists().then((p) => { if (p > 0) { setPlanExists(p) } else { setPlanExists(0) } }).catch(err => handleError(err));;
       API.getPlanCfu().then((c) => { setPlanCfu(c) }).catch(err => handleError(err));
       API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
       API.getPlan().then((plan) => { setActualPlan(plan); setBackupPlan(plan) })
