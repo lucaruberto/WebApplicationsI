@@ -1,14 +1,10 @@
-import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import './App.css';
 import { LoginForm } from './components/LoginComponents';
-import { Container } from 'react-bootstrap/';
 import { useEffect, useState } from 'react';
 import API from './API';
 import { CoursesList, PlanPage } from './components/CoursesList';
-import { PlanComponents } from './components/PlanComponents.js';
-import { propTypes } from 'react-bootstrap/esm/Image';
 
 function App() {
   return (
@@ -24,7 +20,6 @@ function App2() {
   const [planExists, setPlanExists] = useState('');
   const [planCfu, setPlanCfu] = useState(0);
   const [message, setMessage] = useState('');
-  const [dirty, setDirty] = useState(true);
   const [onAdd, setOnAdd] = useState(false);
   const [time, setTime] = useState(''); /* 1 = Full Time, 0 = Part Time */
   const [plan, setPlan] = useState([]);

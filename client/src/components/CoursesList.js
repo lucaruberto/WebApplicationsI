@@ -3,13 +3,11 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Container, Table, Row, Col, Button, Navbar, Form, Nav, Accordion, Alert } from "react-bootstrap";
 import React from "react";
 import { useEffect, useState } from 'react';
-import { useNavigate, Link, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from './LoginComponents';
 import { PlanComponents } from './PlanComponents';
 
 function PlanPage(props) {
-    //console.log(props.planExists);
-    console.log(props.onAdd);
     return (
         <>
             <Container fluid  >
@@ -103,8 +101,8 @@ function CoursesList(props) {
                             <i className="bi bi-infinity" style={{ color: "black" }}></i>{""} Politecnico di Torino
                         </Navbar.Brand>
                         <Nav.Link href="/" style={{ color: "white" }} >Home</Nav.Link>
-                        <Nav.Link href="/home-logged" style={{ color: "white" }} >Pagina Personale</Nav.Link>
-                        <Form className="my-2 my-lg-0 mx-auto d-sm-block"  >
+                        {props.loggedIn ? <Nav.Link href="/home-logged" style={{ color: "white" }} >Pagina Personale</Nav.Link> : ""}
+                        <Form className="my-2 my-lg-0 mx-auto d-sm-block" >
                         </Form>
                         <Nav >
                             {props.loggedIn ? <LogoutButton logout={props.logout} user={props.user} loggedIn={props.loggedIn} /> :
@@ -200,7 +198,7 @@ function CoursesData(props) {
         else if (props.statusClass === "table-danger") {
 
         }
-    }, [props.plan.length, props.loggedIn]);
+    }, [props.plan.length, props.loggedIn]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const checkProp = (cod) => {
         if (props.courses.propedeuticità === cod) {

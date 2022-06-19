@@ -6,7 +6,7 @@ const db = new sqlite.Database('course.sqlite', (err) => {
     if (err) throw err;
 });
 
-// Get all courses
+/* Get all courses */
 exports.listCourses = () => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM Course';
@@ -23,10 +23,12 @@ exports.listCourses = () => {
         });
     });
 };
+
+/* Set plan to 1 (Part Time) or to 2 (Full Time) */
 exports.addPlanFlag = (userId, time) => {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE User SET plan=? WHERE id = ?';
-        db.run(sql, [time, userId], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
+        db.run(sql, [time, userId], function (err) {
             if (err) {
                 reject(err);
                 return;
@@ -35,6 +37,8 @@ exports.addPlanFlag = (userId, time) => {
         resolve(null);
     });
 };
+
+/* Check if a Plan exists */
 exports.getPlanExists = (userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT plan FROM User WHERE id = ?';
@@ -51,6 +55,8 @@ exports.getPlanExists = (userId) => {
         });
     });
 };
+
+/* Get the number of cfu in the Plan */
 exports.getPlanCfu = (userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT SUM(Crediti) as cfu FROM Course JOIN Plan WHERE userid = ? AND Plan.course=Course.Codice';
@@ -67,6 +73,8 @@ exports.getPlanCfu = (userId) => {
         });
     });
 };
+
+/* Get the number of enrolled people in a course */
 exports.getEnrolled = (course) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT COUNT(*) as cnt FROM Plan WHERE course= ?';
@@ -83,6 +91,8 @@ exports.getEnrolled = (course) => {
         });
     });
 };
+
+/* Get the entire Plan */
 exports.getPlan = (userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT Codice, Nome, Crediti, Incompatibilità, Propedeuticità FROM Course JOIN Plan WHERE Plan.course = Course.Codice AND userid = ?';
@@ -109,21 +119,20 @@ exports.getPlan = (userId) => {
         });
     });
 };
-
+/* Insert new course in the Plan */
 exports.createPlan = (course, userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO Plan(userId, course) VALUES(?, ?)';
-        db.run(sql, [userId, course], function (err) {  // <-- NB: function, NOT arrow function so this.lastID works
+        db.run(sql, [userId, course], function (err) {
             if (err) {
                 reject(err);
                 return;
             }
-            //console.log('createExam lastID: ' + this.lastID);
             resolve(this.lastID);
         });
     });
 };
-
+/* Delete a course from Plan */
 exports.deleteCourse = (course, userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM Plan WHERE course = ? AND userid = ?';
@@ -136,7 +145,7 @@ exports.deleteCourse = (course, userId) => {
         });
     });
 }
-
+/* Delete the Plan */
 exports.deletePlan = (userId) => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM Plan WHERE userId = ?';

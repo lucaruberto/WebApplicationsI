@@ -11,8 +11,7 @@ const userDao = require('./daoUser'); // module for accessing the users in the D
 const cors = require('cors');
 
 /*** Set up Passport ***/
-// set up the "username and password" login strategy
-// by setting a function to verify username and password
+
 passport.use(new LocalStrategy(
   function (username, password, done) {
     userDao.getUser(username, password).then((user) => {
@@ -24,13 +23,10 @@ passport.use(new LocalStrategy(
   }
 ));
 
-// serialize and de-serialize the user (user object <-> session)
-// we serialize the user id and we store it in the session: the session is very small in this way
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// starting from the data in the session, we extract the current (logged-in) user
 passport.deserializeUser((id, done) => {
   userDao.getUserById(id)
     .then(user => {
@@ -63,7 +59,6 @@ const isLoggedIn = (req, res, next) => {
 
 // set up the session
 app.use(session({
-  // by default, Passport uses a MemoryStore to keep track of the sessions
   secret: 'a secret sentence not to share with anybody and anywhere, used to sign the session ID cookie',
   resave: false,
   saveUninitialized: false
@@ -155,7 +150,54 @@ app.get('/api/enrolled', isLoggedIn, async (req, res) => {
 
 /* POST /api/plan */
 app.post('/api/plan', isLoggedIn, [check('plan').isArray(),
-check('*plan.codice').isLength({ min: 7, max: 7 })
+check('plan.*.codice').isLength({ min: 7, max: 7 }),
+check('plan.*.crediti').isInt(),
+check('plan.*.nome').isLength({ min: 1, max: 160 }),
+check('plan').custom((c, { req }) => {
+  let i = 0;
+  i = c.reduce((a, b) => a + b.crediti, 0);
+  if (req.body.time === 1) {
+    if (i < 20 || i > 40)
+      throw new Error("Numero di crediti non valido per Part Time");
+    else return true;
+  }
+  else if (req.body.time === 2) {
+    if (i < 60 || i > 80) {
+      throw new Error("Numero di crediti non valido per Full Time");
+    }
+    else return true;
+  }
+  return new Error("Non selezionato Part Time o Full Time");
+}),
+check('plan.*.propedeuticità').optional({ checkFalsy: true }).custom((p, { req }) => {
+
+  if (!req.body.plan.some((x) => x.codice === p)) {
+    throw new Error("Manca l'esame propedeutico " + p);
+  }
+  else return true;
+}
+),
+check('plan.*.incompatibilità').optional({ checkFalsy: true }).custom((i, { req }) => {
+  if (req.body.plan.some((x) => i.indexOf(x.codice) !== -1)) {
+    throw new Error("Esame incompatibile");
+  }
+  else return true;
+}),
+check('plan.*').optional({ checkFalsy: true }).custom(async (c, { req }) => {
+  const iscritti = await dao.getEnrolled(c.codice);
+
+  if (c.maxstudenti > 0 && iscritti[0].cnt >= c.maxstudenti)
+    throw new Error("Numero iscritti superato");
+  return true;
+}),
+check('plan.*.codice').custom(async (c, { req }) => {
+  const plan = await dao.getPlan(req.user.id)
+  if (plan.some((x) => x.codice === c))
+    throw new Error("Esame già presente nel piano di studi");
+  else return true;
+}
+)
+
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -169,12 +211,52 @@ check('*plan.codice').isLength({ min: 7, max: 7 })
     res.status(201).end();
   } catch (err) {
     console.log(err);
-    // res.status(503).json({error: `Database error during the creation of exam ${plan.code}.`});
   }
 });
 
 /* POST /api/planUpdate */
-app.post('/api/planUpdate', isLoggedIn, [check('plan').isArray()
+app.post('/api/planUpdate', isLoggedIn, [
+  check('plan').isArray(),
+  check('plan.*.codice').isLength({ min: 7, max: 7 }),
+  check('plan.*.crediti').isInt(),
+  check('plan.*.nome').isLength({ min: 1, max: 160 }),
+  check('plan').custom((c, { req }) => {
+    let i = 0;
+    i = c.reduce((a, b) => a + b.crediti, 0);
+    if (req.body.time === 1) {
+      if (i < 20 || i > 40)
+        throw new Error("Numero di crediti non valido per Part Time");
+      else return true;
+    }
+    else if (req.body.time === 2) {
+      if (i < 60 || i > 80) {
+        throw new Error("Numero di crediti non valido per Full Time");
+      }
+      else return true;
+    }
+    return new Error("Non selezionato Part Time o Full Time");
+  }),
+  check('plan.*.propedeuticità').optional({ checkFalsy: true }).custom((p, { req }) => {
+
+    if (!req.body.plan.some((x) => x.codice === p)) {
+      throw new Error("Manca l'esame propedeutico " + p);
+    }
+    else return true;
+  }
+  ),
+  check('plan.*.incompatibilità').optional({ checkFalsy: true }).custom((i, { req }) => {
+    if (req.body.plan.some((x) => i.indexOf(x.codice) !== -1)) {
+      throw new Error("Esame incompatibile");
+    }
+    else return true;
+  }),
+  check('plan.*').optional({ checkFalsy: true }).custom(async (c, { req }) => {
+    const iscritti = await dao.getEnrolled(c.codice);
+
+    if (c.maxstudenti > 0 && iscritti[0].cnt >= c.maxstudenti)
+      throw new Error("Numero iscritti superato");
+    return true;
+  }),
 ], async (req, res) => {
   let padd = [];
   let pdel = [];
@@ -184,7 +266,7 @@ app.post('/api/planUpdate', isLoggedIn, [check('plan').isArray()
   }
   try {
     const p = await dao.getPlan(req.user.id);
-    console.log(p);
+
     for (let c of req.body.plan) {
       if (!p.some((d) => c.codice === d.codice)) {
         padd.push(c.codice);
@@ -204,21 +286,9 @@ app.post('/api/planUpdate', isLoggedIn, [check('plan').isArray()
     res.status(201).end();
   } catch (err) {
     console.log(err);
-    // res.status(503).json({error: `Database error during the creation of exam ${plan.code}.`});
   }
 });
 /* DELETE */
-
-/* DELETE /api/plan/:course */
-/* app.delete('/api/planCourse', isLoggedIn, async (req, res) => {
-  try {
-    await dao.deletePlanCourse(req.params.code, req.user.id);
-    res.status(204).end();
-  } catch (err) {
-    console.log(err);
-    res.status(503).json({ error: `Database error during the deletion of course from a Plan ${req.params.code}.` });
-  }
-});  */
 
 /* DELETE /api/plan/ */
 app.delete('/api/plan', isLoggedIn, async (req, res) => {
@@ -231,6 +301,7 @@ app.delete('/api/plan', isLoggedIn, async (req, res) => {
     res.status(503).json({ error: `Database error during the deletion of Plan for the user ${req.user.id}.` });
   }
 });
+
 /*** Users APIs ***/
 
 // POST /sessions 
@@ -240,7 +311,6 @@ app.post('/api/sessions', function (req, res, next) {
     if (err)
       return next(err);
     if (!user) {
-      // display wrong login messages
       return res.status(401).json(info);
     }
     // success, perform the login
@@ -248,8 +318,6 @@ app.post('/api/sessions', function (req, res, next) {
       if (err)
         return next(err);
 
-      // req.user contains the authenticated user, we send all the user info back
-      // this is coming from userDao.getUser()
       return res.json(req.user);
     });
   })(req, res, next);

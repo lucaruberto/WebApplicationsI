@@ -1,10 +1,8 @@
 import React from 'react';
 import { Button, Container, Table, Row, Col, Stack } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import API from '../API';
 function PlanComponents(props) {
     const handleSubmit = (event) => {
-        console.log(props.plan);
         let ok = false;
         event.preventDefault();
         //ADD
@@ -41,7 +39,6 @@ function PlanComponents(props) {
         }
     }
     const handleDelete = (codice) => {
-        let cod;
         if (props.plan.some((c) => c.propedeuticità === codice)) {
             props.setMessage("Non è possibile eliminare il corso in quanto propedeutico");
         }
@@ -54,7 +51,7 @@ function PlanComponents(props) {
 
     return (<>
         <Col md={10} >
-            <h1> {props.planExists ? ("Piano degli studi di: " + props.user?.name) : "Nuovo Piano degli studi"} {""}
+            <h1> {props.planExists ? ("Piano di studi di: " + props.user?.name) : "Nuovo Piano degli studi"} {""}
                 {props.planExists ? (props.planExists === 1 ? "(Part Time)" : "(Full Time)") : props.time === 0 ? "(Part Time)" : "(Full Time)"}</h1>
 
         </Col>
@@ -136,10 +133,6 @@ function PlanData(props) {
 function PlanNumberStudents(props) {
     let cfuMin;
     let cfuMax;
-    const divStyle = {
-        color: 'black',
-        border: "2px solid orange"
-    };
     if (props.time === 1 || props.planExists === 1) {
         cfuMin = 20; cfuMax = 40;
     }
@@ -150,7 +143,7 @@ function PlanNumberStudents(props) {
     return (
         <>
             <Stack direction="horizontal" gap={5}>
-                <div>Cfu Attuali</div>
+                <div>Cfu Totali</div>
                 <div>{props.planCfu}</div>
                 <div>Min Cfu</div>
                 <div>{cfuMin}</div>
@@ -159,17 +152,6 @@ function PlanNumberStudents(props) {
             </Stack>
         </>);
 };
-/* Actual Cfu */
-function Cfu(props) {
-    const divStyle = {
-        color: 'black',
-        border: "2px solid black"
-    };
-    return (
-        <div >
-            1
-        </div>
-    );
-};
+
 
 export { PlanComponents };
