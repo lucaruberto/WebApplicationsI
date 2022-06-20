@@ -21,11 +21,13 @@ function App2() {
   const [planCfu, setPlanCfu] = useState(0);
   const [message, setMessage] = useState('');
   const [onAdd, setOnAdd] = useState(false);
-  const [time, setTime] = useState(''); /* 1 = Full Time, 0 = Part Time */
+  const [time, setTime] = useState(''); /* 2 = Full Time, 1 = Part Time */
   const [plan, setPlan] = useState([]);
   const [enrolled, setEnrolled] = useState([]);
   const [actualPlan, setActualPlan] = useState([]);
   const [backupPlan, setBackupPlan] = useState([]);
+  const [messageLog, setMessageLog] = useState('');
+  const [show, setShow] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -144,7 +146,8 @@ function App2() {
         navigate('/home-logged');
       })
       .catch(err => {
-        setMessage(err);
+        setMessageLog(err);
+        setShow(true);
       }
       )
   }
@@ -159,7 +162,7 @@ function App2() {
     <>
       <Routes>
         <Route path='/' element={<CoursesList courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} plan={plan} enrolled={enrolled} />} />
-        <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} />} />
+        <Route path='/login' element={loggedIn ? <Navigate to='/home-logged' /> : <LoginForm login={doLogIn} messageLog={messageLog} setMessageLog={setMessageLog} show={show} setShow={setShow} />} />
         <Route path='/home-logged' element={loggedIn ? <PlanPage courses={courses} loggedIn={loggedIn} logout={doLogOut} user={user} message={message} setMessage={setMessage}
           planExists={planExists} setPlanExists={setPlanExists} time={time} setTime={setTime} deletePlan={deletePlan} backupPlan={backupPlan} setActualPlan={setActualPlan}
           onAdd={onAdd} setOnAdd={setOnAdd} planCfu={planCfu} addCoursePlan={addCoursePlan} plan={plan} actualPlan={actualPlan} incrementCfu={incrementCfu} setPlanCfu={setPlanCfu}

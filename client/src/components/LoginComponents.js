@@ -3,11 +3,10 @@ import { useState } from 'react';
 function LoginForm(props) {
   const [username, setUsername] = useState('luca@studenti.polito.it');
   const [password, setPassword] = useState('password');
-  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setErrorMessage('');
+    props.setMessageLog('');
     const credentials = { username, password };
 
     // SOME VALIDATION, ADD MORE!!!
@@ -20,7 +19,7 @@ function LoginForm(props) {
     }
     else {
       // show a better error message...
-      setErrorMessage('Error(s) in the form, please fix it.')
+      props.setMessageLog('Error(s) in the form, please fix it.')
     }
   };
 
@@ -30,7 +29,7 @@ function LoginForm(props) {
         <Col>
           <h2>Login</h2>
           <Form>
-            {errorMessage ? <Alert variant='danger'>{errorMessage}</Alert> : ''}
+            <Alert dismissible show={props.show} onClose={() => props.setShow(false)} variant="danger">{props.messageLog} </Alert>
             <Form.Group controlId='username'>
               <Form.Label>email</Form.Label>
               <Form.Control type='email' value={username} onChange={ev => setUsername(ev.target.value)} />
