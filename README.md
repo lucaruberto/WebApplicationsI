@@ -220,7 +220,7 @@
 
 ## Screenshot
 
-![Screenshot](./img/screenshot.jpg)
+![Screenshot](/client/img/screenshot.jpg)
 
 ## Users Credentials
 
