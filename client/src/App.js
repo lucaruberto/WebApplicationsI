@@ -45,13 +45,6 @@ function App2() {
     checkAuth();
   }, []);
 
-  /*useEffect(() => {
-    if (loggedIn)
-      API.getAllCourses()
-        .then((courses) => { setCourses(courses); setDirty(true); })
-        .catch(err => handleError(err))
-  }, [loggedIn])*/
-
   function addCoursePlan(course, planExists) {
     if (planExists) {
       incrementCfu(course.crediti);
@@ -129,10 +122,9 @@ function App2() {
     setPlanCfu(i => i - cfu);
   }
   useEffect(() => {
-    /* setCourses(list.nome.sort((Architetture, Database) => Architetture - Database))  */
     API.getAllCourses().then((list) => { setCourses(list) })
       .catch(err => handleError(err))
-  }, [loggedIn, planExists])
+  }, [])
 
   function handleError(err) {
     console.log(err);
