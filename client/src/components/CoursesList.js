@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from './LoginComponents';
 import { PlanComponents } from './PlanComponents';
+
 function PlanPage(props) {
+
     return (
         <>
             <Container fluid  >

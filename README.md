@@ -203,8 +203,9 @@
 
 ## Database Tables
 
-- Table `courses` (in `CoursesList`) - Contiene (Aggiungi, Codice, Nome, Crediti, Numero iscritti, Max Studenti, Dettagli, Errori) per ogni corso selezionabile nel plano
-- Table `plan` (in `PlanComponents`) - Contiene (Elimina, Codice, Nome, Crediti, Numero iscritti, Max Studenti) per ogni corso nel piano creato o esistente
+- Table `Course` - Contiene ( Codice, Nome, Crediti, Max Studenti, Incompatibilità, Propedeuticità) per ogni corso selezionabile nel plano
+- Table `Plan` - Contiene (userid, course) coppia univoca che associa l'esame ad un certo utente, nelle righe sono presenti più coppie con lo stesso userid ma diverso course che formano il piano di studi
+- Table `User` - Contiene (id, email, password, name, salt, plan) per ogni utente, plan=-1 indica che non esiste un piano per quello studente, plan=1 (piano Part-Time), plan=2 (piano Full Time)
 
 ## Main React Components
 
