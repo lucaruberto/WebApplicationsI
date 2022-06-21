@@ -1,16 +1,12 @@
 import React from 'react';
 import { Button, Container, Table, Row, Col, Stack } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+
 function PlanComponents(props) {
+
     const handleSubmit = (event) => {
         let ok = false;
         event.preventDefault();
-        //ADD
-
-        /* Lunghezza = 0 scarta */
-        /* Controllo con i cfu min e max */
-        /* Controllo lunghezza codice 7 caratteri */
-        /* Controllo nome, crediti, codici esistono */
         if (props.plan.length > 0) {
             for (let c of props.plan) {
                 if ((!(c.codice === undefined)) && (!(c.nome === undefined)) && (!(c.crediti === undefined)) && (props.time === 1 || props.time === 2)) {
@@ -27,15 +23,13 @@ function PlanComponents(props) {
         }
         if (ok && !props.planExists) {
             props.addPlan(props.plan, props.time);
-
-            /* Settare esistenza piano */
-            //navigate(`/home-logged`);
         }
         else if (ok && props.planExists) {
             props.updatePlan(props.plan);
         }
         else {
-            props.setMessage("Non è possibile inserire o aggiornare il piano in quanto non rispetta i parametri")
+            props.setMessage("Non è possibile inserire o aggiornare il piano in quanto non rispetta i parametri");
+            props.setVariant("danger");
         }
     }
 
@@ -76,7 +70,7 @@ function PlanComponents(props) {
                 </Col>
                 <Col xs={1}>
                     <Link to="/home-logged">
-                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.setPlanCfu(0) }} variant="danger">Annulla</Button>
+                        <Button onClick={() => { props.setPlan([]); props.setOnAdd(false); props.setPlanCfu(0); props.setVariant("success"); props.setMessage("Modifiche annullate") }} variant="danger">Annulla</Button>
                     </Link>
                 </Col></Row>
                 :
@@ -87,7 +81,7 @@ function PlanComponents(props) {
                 </Col>
                     <Col xs={1}>
                         <Link to="/home-logged">
-                            <Button onClick={() => props.setActualPlan(props.backupPlan)} variant="warning">Annulla</Button>
+                            <Button onClick={() => { props.setActualPlan(props.backupPlan); props.setPlanCfu(props.backupCfu); props.setVariant("success"); props.setMessage("Modifiche annullate") }} variant="warning">Annulla</Button>
                         </Link>
                     </Col>
                     <Col xs={1}>
@@ -99,7 +93,7 @@ function PlanComponents(props) {
             }
         </Col>
     </>);
-    /*  <Button onClick={() => props.setOnAdd(false) } variant="warning">Salva</Button> */
+
 };
 
 function PlanRow(props) {
@@ -111,6 +105,7 @@ function PlanRow(props) {
         </>
     );
 };
+
 function PlanData(props) {
     return (
         <>
@@ -125,6 +120,7 @@ function PlanData(props) {
         </>
     );
 };
+
 function PlanNumberStudents(props) {
     let cfuMin;
     let cfuMax;
