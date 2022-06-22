@@ -50,7 +50,7 @@ async function getPlanCfu() {
     }
 }
 async function getEnrolled() {
-    const response = await fetch(new URL('enrolled', APIURL), { credentials: 'include' });
+    const response = await fetch(new URL('enrolled', APIURL));
     const planJson = await response.json();
     let p = [];
     /* Array di campi cnt da associare a numero iscritti */

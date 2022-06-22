@@ -118,7 +118,7 @@ app.get('/api/planCfu', isLoggedIn, async (req, res) => {
 });
 
 /* GET /api/enrolled */
-app.get('/api/enrolled', isLoggedIn, async (req, res) => {
+app.get('/api/enrolled', async (req, res) => {
   try {
     let cnt = [];
     let courses = await dao.listCourses();

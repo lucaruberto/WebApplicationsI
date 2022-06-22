@@ -49,7 +49,7 @@ function App2() {
 
   useEffect(() => {
     API.getAllCourses().then((list) => { setCourses(list) })
-      .catch(err => handleError(err))
+      .catch(err => handleError(err));
   }, []);
 
   useEffect(() => {
@@ -62,10 +62,7 @@ function App2() {
   }, [loggedIn, onAdd]);
 
   useEffect(() => {
-    if (loggedIn) {
-      API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
-    }
-
+    API.getEnrolled().then((c) => setEnrolled(c)).catch(err => handleError(err));
   }, [loggedIn, onAdd, time, planCfu]);
 
   function addCoursePlan(course, planExists) {
